@@ -100,6 +100,7 @@ class Dictionary {
 			
 		}
 
+		//Returns true if the word is in the dictionary
 		bool isWord(string word) {
 			return contains(root, word);
 		}		
