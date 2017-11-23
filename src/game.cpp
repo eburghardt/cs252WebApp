@@ -21,6 +21,54 @@ class Game {
 				
 		}
 
+		int getLetterValue(char c) {
+			switch(c) {
+				case 'a':
+				case 'e':
+				case 'i':
+				case 'o':
+				case 'n':
+				case 'r':
+				case 't':
+				case 'l':
+				case 's':
+				case 'u':
+					return 1;
+					break;
+				case 'd':
+				case 'g':
+					return 2;
+					break;
+				case 'b':
+				case 'c':
+				case 'm':
+				case 'p':
+					return 3;
+					break;
+				case 'f':
+				case 'h':
+				case 'v':
+				case 'w':
+				case 'y':
+					return 4;
+					break;
+				case 'k':
+					return 5;
+					break;
+				case 'j':
+				case 'x':
+					return 8;
+					break;
+				case 'q':
+				case 'z':
+					return 10;
+					break;
+				default:
+					return 0;
+					break;
+			}
+		}
+
 		
 		
 }
