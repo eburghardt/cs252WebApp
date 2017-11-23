@@ -160,6 +160,57 @@ class Board {
 			}
 		}
 
+		//Given the word to be played and its location, returns the mutiplier the user would get for that move
+		//When multiple multipliers are encountered, their product is used
+		int getMultiplier(string play, int x, int y, int z, int direction) {
+			if(play.length() == 0) {
+				return 1;
+			}
+
+			if(x < 0 || x >= _BOARD_SIZE || y < 0 || y >= _BOARD_SIZE || z < 0 || z >= _BOARD_SIZE) {
+				//out of bounds
+				return 0;
+			}
+
+			int multiplier = 1;
+
+			if(play.at(0) >= 'a' && play.at(0) <= 'z') {
+				switch(getChar(x, y, z)) {
+					case '2':
+						multiplier = 2;
+						break;
+					case '3':
+						multiplier = 3;
+						break;
+					case '4':
+						multiplier = 4;
+						break;
+					case '5':
+						multiplier = 5;
+						break;
+					default:
+						multiplier = 1;
+				}
+			}
+
+			switch(direction) {
+				case 0:
+					return multiplier * getMultiplier(play.substr(1, string::npos), x + 1, y, z, direction);
+					break;
+				case 1:
+					return multiplier * getMultiplier(play.substr(1, string::npos), x, y + 1, z, direction);
+					break;
+				case 2:
+					return multiplier * getMultiplier(play.substr(1, string::npos), x, y, z + 1, direction);
+					break;
+				default:
+					//invalid direction
+					return 0;
+					break;
+
+			}
+		}
+
 		//String should be of the format "[a-z ]+" where spaces are for letters already on the board 
 		void placeString(string play, int x, int y, int z, int direction) {
 			if(play.length() == 0) {
@@ -229,6 +280,7 @@ int main() {
 	board.placeChar('a', 7, 7, 7);
 	cout << board.printBoard() << endl;
 
+	cout << board.getMultiplier(" testing", 7, 7, 7, 1) << endl;
 
 	cout << board.canPlaceString("test", 7, 7, 7, 0) << endl;
 
