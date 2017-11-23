@@ -69,6 +69,12 @@ class Game {
 			}
 		}
 
-		
+		int getWordValue(string play) {
+			int value = 0;
+			for(int i = 0; i < play.length(); i++) {
+				value += getLetterValue(play.at(i));
+			}
+			return value;
+		}	
 		
 }
