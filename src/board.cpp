@@ -9,6 +9,8 @@
 #include <cmath>
 #include <string>
 #include <iostream>
+#include <vector>
+#include <iterator>
 
 #define _BOARD_SIZE 15
 
@@ -20,6 +22,21 @@ class Board {
 		//before the first move
 		char *** charBoard;
 		int center;
+
+		/* @method getOffAxisWordList
+		 * @brief	This function is a helper function for getPlayWordList that finds off axis words. 
+		 *
+		 * @param string play	The word to be played. Will have already been verified as board legal by canPlaceString
+		 *			Characters already on the board will be spaces here. The method is recursive and removes
+					the first letter with each call.
+		 * @param int x, y, z	These refer to the current position in the word
+		 * @param int direction	This tells the direction of the play. 0 is x, 1 is y, and 2 is z.
+		 */
+		vector<string> getOffAxisWordList(string play, int x, int y, int z, int direction) {
+			vector<string> emptyVector;
+			return emptyVector;	
+		}
+
 	public:
 		//constructor
 		Board() {
@@ -211,6 +228,52 @@ class Board {
 			}
 		}
 
+		/* @method getPlayWordList
+		 * @brief	This function takes a play as input and returns a list of new words that would result from that play. 
+		 * 		The first element of the vector will be the word in the direction of the play, followed by words in
+		 *		the other 2 directions. These will only be present if the play creates more than 1 new word.
+		 *
+		 * @param string play	The word to be played. Will have already been verified as board legal by canPlaceString
+		 *			Characters already on the board will be spaces here.
+		 * @param int x, y, z	These refer to the starting position of the word
+		 * @param int direction	This tells the direction of the play. 0 is x, 1 is y, and 2 is z.
+		 */
+		vector<string> getPlayWordList(string play, int x, int y, int z, int direction) {
+			string onAxis = "";
+			//read word on axis of play, filling in spaces with characters from the board
+			for(int i = 0; i < play.length(); i++) {
+				if(play.at(i) != ' ') {
+					onAxis += play.at(i);
+				} else {
+					switch(direction) {
+						case 0:
+							onAxis += getChar(x + i, y, z);			
+							break;
+						case 1:
+							onAxis += getChar(x, y + i, z);			
+							break;
+						case 2:
+							onAxis += getChar(x, y, z + i);			
+							break;
+						default:
+							//something went wrong
+							vector<string> emptyVector;
+							return emptyVector;
+					}	
+				}
+			}
+
+			vector<string> wordList;
+			vector<string>::iterator it = wordList.begin();
+			wordList.insert(it, onAxis);
+			
+			//get off-axis words
+			vector<string> offAxis = getOffAxisWordList(play, x, y, z, direction);
+			//Append them to our list
+			wordList.insert(it, offAxis.begin(), offAxis.end());
+			return wordList;
+		}
+
 		//String should be of the format "[a-z ]+" where spaces are for letters already on the board 
 		void placeString(string play, int x, int y, int z, int direction) {
 			if(play.length() == 0) {
@@ -289,6 +352,15 @@ int main() {
 	board.placeString(" test", 7, 7, 7, 0);
 	cout << board.printBoard() << endl;
 
+	vector<string> wordList = board.getPlayWordList("tes ing", 11, 4, 7, 1);
+	
+	cout << "WordList: " << endl;	
+
+	vector<string>::iterator it;
+	for(it = wordList.begin(); it < wordList.end(); it++) {
+		cout << *it << endl;
+	}
+
 	board.placeString("tes ing", 11, 4, 7, 1);
-	cout << board.printBoard() << endl;
+
 }
