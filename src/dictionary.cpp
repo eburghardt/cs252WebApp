@@ -109,7 +109,8 @@ class Dictionary {
 
 int main(int argc, char ** argv) {
 	//For testing purposes
-	Dictionary dictionary("../assets/dictionary.txt");
+	//Dictionary dictionary("../assets/dictionary.txt");
+	Dictionary dictionary("./assets/dictionary.txt");
 
 	for(int i = 0; i < argc; i++) {
 		if(i == 0)
@@ -117,4 +118,6 @@ int main(int argc, char ** argv) {
 		cout << "Is word: " << argv[i] << "?\n";
 		cout << dictionary.isWord(argv[i]) << "\n";
 	}
+
+
 }

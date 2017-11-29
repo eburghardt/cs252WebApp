@@ -12,14 +12,7 @@ class Game {
 	private:
 		Player ** players;
 		Board board;
-	public:
-		//constructor
-		// @param numPlayers = number of players
-		// @param players = pointer to array of player pointers
-		Game(int numPlayers, Player ** players) {
-			board = new Board(15);
-				
-		}
+		Dictionary dictionary;		
 
 		int getLetterValue(char c) {
 			switch(c) {
@@ -75,6 +68,36 @@ class Game {
 				value += getLetterValue(play.at(i));
 			}
 			return value;
-		}	
+		}
+	public:
+		//constructor
+		// @param numPlayers = number of players
+		// @param players = pointer to array of player pointers
+		Game(int numPlayers, Player ** players) {
+			board = new Board(15);
+			dictionary = new Dictionary("./assets/dictionary.txt");
+			
+		}
+
+		int getPlayValue(string play, int x, int y, int z, int direction) {
+			int multiplier = board.getMultiplier(play, x, y, z, direction);
+			int base = getWordValue(play);
+			return multiplier * base;
+		}		
 		
+		/**
+		 * @method play
+		 * @brief Plays the word on the board in the given position if possible
+		 *
+		 * @param	play = word to be played. Contains only letters from player's hand and spaces
+		 * @param	x, y, z = position on board
+		 * @param	direction = axis on which the letters are being played 0 = x, 1 = y, 2 = z
+		 *
+		 * @return 	true if play is successful
+		 *		false if not legal
+		 */
+		bool play(string play, int x, int y, int z, int direction) {
+			//Check legality of play
+			
+		}
 }
