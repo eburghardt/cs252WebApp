@@ -33,9 +33,119 @@ class Board {
 		 * @param int direction	This tells the direction of the play. 0 is x, 1 is y, and 2 is z.
 		 */
 		vector<string> getOffAxisWordList(string play, int x, int y, int z, int direction) {
-			//TODO: Do this
-			vector<string> emptyVector;
-			return emptyVector;	
+			if(play.length() == 0) {
+				vector<string> emptyVector;
+				return emptyVector;
+			}
+
+			//for each letter in the word, we need to check the off-axes for words
+			//Skip spaces. They represent letters already on the board.
+			vector<string> wordList;
+			if(play.at(0) != ' ') {
+				if(direction != 0) {
+					string wordX = findWordX(play.at(0), x, y, z);
+					if(wordX.length() > 1) {
+						wordList.insert(wordList.end(), wordX);
+					}	
+				}
+
+				if(direction != 1) {
+					string wordY = findWordY(play.at(0), x, y, z);
+					if(wordY.length() > 1) {
+						wordList.insert(wordList.end(), wordY);
+					}
+				}
+
+				if(direction != 2) {
+					string wordZ = findWordZ(play.at(0), x, y, z);
+					if(wordZ.length() > 1) {
+						wordList.insert(wordList.end(), wordZ);
+					}
+				}
+			}
+
+			vector<string> restOfWord;
+			switch(direction) {
+				case 0:
+					restOfWord = getOffAxisWordList(play.substr(1, string::npos), x + 1, y, z, direction);
+					break;
+				case 1:
+					restOfWord = getOffAxisWordList(play.substr(1, string::npos), x, y + 1, z, direction);
+					break;
+				case 2:
+					restOfWord = getOffAxisWordList(play.substr(1, string::npos), x, y, z + 1, direction);
+					break;
+				default:
+					//invalid direction
+					break;
+			}
+
+			//append the rest of the list to our list
+			wordList.insert(wordList.end(), restOfWord.begin(), restOfWord.end());
+			
+			return wordList;	
+		}
+
+		string findWordX(char c, int x, int y, int z) {
+			int startX = x;
+			//Traverse left
+			while(getChar(startX - 1, y, z) >= 'a' && getChar(startX - 1, y, z) <= 'z') {
+				startX--;
+			} 
+
+			string out = "";
+			while(startX == x || (getChar(startX, y, z) >= 'a' && getChar(startX, y, z) <= 'z')) {
+				if(startX == x) {
+					out += c;
+					startX++;
+				} else {
+					out += getChar(startX++, y, z);
+				}
+			}
+
+			return out;
+		}
+
+		string findWordY(char c, int x, int y, int z) {
+			int startY = y;
+			//Traverse left
+			while(getChar(x, startY - 1, z) >= 'a' && getChar(x, startY - 1, z) <= 'z') {
+				startY--;
+			} 
+
+			string out = "";
+			while(startY == y || (getChar(x, startY, z) >= 'a' && getChar(x, startY, z) <= 'z')) {
+				if(startY == y) {
+					out += c;
+					startY++;
+				} else {
+					out += getChar(x, startY++, z);
+				}
+			}
+
+			return out;
+
+		}
+
+		string findWordZ(char c, int x, int y, int z) {
+			int startZ = z;
+			//Traverse left
+			while(getChar(x, y, startZ - 1) >= 'a' && getChar(x, y, startZ - 1) <= 'z') {
+				startZ--;
+			} 
+
+			string out = "";
+			while(startZ == z || (getChar(x, y, startZ) >= 'a' && getChar(x, y, startZ) <= 'z')) {
+				if(startZ == z) {
+					out += c;
+					startZ++;	
+				} else {
+					out += getChar(x, y, startZ);
+				}
+			}
+
+			return out;
+
 		}
 
 	public:
@@ -242,6 +352,7 @@ class Board {
 		vector<string> getPlayWordList(string play, int x, int y, int z, int direction) {
 			string onAxis = "";
 			//read word on axis of play, filling in spaces with characters from the board
+			//TODO: Change this so it backtracks; use private methods from above
 			for(int i = 0; i < play.length(); i++) {
 				if(play.at(i) != ' ') {
 					onAxis += play.at(i);
@@ -265,13 +376,12 @@ class Board {
 			}
 
 			vector<string> wordList;
-			vector<string>::iterator it = wordList.begin();
-			wordList.insert(it, onAxis);
+			wordList.insert(wordList.begin(), onAxis);
 			
 			//get off-axis words
 			vector<string> offAxis = getOffAxisWordList(play, x, y, z, direction);
 			//Append them to our list
-			wordList.insert(it, offAxis.begin(), offAxis.end());
+			wordList.insert(wordList.end(), offAxis.begin(), offAxis.end());
 			return wordList;
 		}
 
@@ -341,7 +451,7 @@ int main() {
 
 	cout << board.printBoard() << endl;
 
-	board.placeChar('a', 7, 7, 7);
+	//board.placeChar('a', 7, 7, 7);
 	cout << board.printBoard() << endl;
 
 	cout << board.getMultiplier(" testing", 7, 7, 7, 1) << endl;
@@ -350,11 +460,24 @@ int main() {
 
 	cout << board.canPlaceString(" test", 7, 7, 7, 0) << endl;
 
-	board.placeString(" test", 7, 7, 7, 0);
+	board.placeString("test", 7, 7, 7, 0);
+	board.placeString("est", 10, 8, 7, 1);
+	board.placeString("est", 7, 8, 7, 1);
+ 	
+	cout << board.printBoard() << endl;
+	
+	cout << board.canPlaceString("sets", 7, 11, 7, 0) << endl;
+	
+	
+	
+	vector<string> wordList = board.getPlayWordList("sets", 7, 11, 7, 0);
+	
+	board.placeString("sets", 7, 11, 7, 0);
+
+	cout << "here" << endl;
 	cout << board.printBoard() << endl;
 
-	vector<string> wordList = board.getPlayWordList("tes ing", 11, 4, 7, 1);
-	
+		
 	cout << "WordList: " << endl;	
 
 	vector<string>::iterator it;
