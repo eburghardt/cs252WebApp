@@ -1,12 +1,9 @@
 CXX = g++ -std=c++11
 
-all: board dictionary
+all: game
 
-dictionary: ./src/dictionary.cpp
-	$(CXX) -o ./bin/$@ ./src/dictionary.cpp
-
-board: ./src/board.cpp
-	$(CXX) -o ./bin/$@ ./src/board.cpp
+game: ./src/game.cpp
+	$(CXX) -o ./bin/$@ ./src/game.cpp ./src/dictionary.cpp ./src/board.cpp ./src/player.cpp
 
 clean: 
 	rm ./bin/* 

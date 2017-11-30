@@ -7,20 +7,9 @@
  * @date 11/11/2017
  */
 
-#include <string>	//string manipulations
-#include <fstream>	//reading dictionary file
-#include <iostream>	//I/O
-#include <locale>	// locale, tolower
+#include "../include/dictionary.hpp"
 
 using namespace std;
-
-const int ALPHABET_SIZE = 26; //26 characters in the english alphabet
-
-typedef struct Node {
-	Node * children[ALPHABET_SIZE]; //1 child node for each letter in the alphabet
-	
-	bool isWordEnd;	//If true, this node is the last character in a word. Parents are prefixes.
-} Node;
 
 Node * createNode() { //Constructor method
 	Node * newNode = new Node;
@@ -78,35 +67,38 @@ bool contains(Node * root, string word) {
 
 
 
+Dictionary::Dictionary() {
+	fileName = "./assets/dictionary.txt";
+	root = createNode();
+	
+	ifstream infile(fileName.c_str());
+	string line;
+	while(getline(infile, line)) {
+		add(root, line);
+	}
+}
 
+Dictionary::Dictionary(string fn) {
+	fileName = fn;
+	root = createNode();
 
-class Dictionary {
-	private:
-		Node * root;
-		string fileName;	
-	public:
-		Dictionary(string fn) {
-			fileName = fn;
-			root = createNode();
+	//Build trie
+	
+	//First, open file, then, line by line, read the words into the trie
+	ifstream infile(fn.c_str());
+	string line;
+	while(getline(infile, line)) {
+		add(root, line);
+	}
+	
+}
 
-			//Build trie
-			
-			//First, open file, then, line by line, read the words into the trie
-			ifstream infile(fn.c_str());
-			string line;
-			while(getline(infile, line)) {
-				add(root, line);
-			}
-			
-		}
+//Returns true if the word is in the dictionary
+bool Dictionary::isWord(string word) {
+	return contains(root, word);
+}		
 
-		//Returns true if the word is in the dictionary
-		bool isWord(string word) {
-			return contains(root, word);
-		}		
-};
-
-
+/*
 int main(int argc, char ** argv) {
 	//For testing purposes
 	//Dictionary dictionary("../assets/dictionary.txt");
@@ -121,3 +113,4 @@ int main(int argc, char ** argv) {
 
 
 }
+*/
