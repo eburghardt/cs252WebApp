@@ -23,6 +23,8 @@ class Game {
 		int getPlayValue(std::string play, int x, int y, int z, int direction);
 		bool play(std::string play, int x, int y, int z, int direction, Player &player);
 		Board getBoard();
+
+		void startGame();
 };
 
 #endif

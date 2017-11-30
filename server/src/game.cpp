@@ -1,4 +1,4 @@
-/**
+/*
  * @file game.cpp
  * @brief This class implements the logic behind a 3d scrabble game. 
  *
@@ -133,6 +133,10 @@ bool Game::play(string play, int x, int y, int z, int direction, Player &player)
 
 Board Game::getBoard() {
 	return board;
+}
+
+void Game::startGame() {
+	
 }
 
 int main() {
