@@ -154,6 +154,13 @@ int main() {
 	//players.insert(players.end(), player2);
 	
 	Game game(playerList);
+	
+	Board gameBoard = game.getBoard();
+	gameBoard.placeChar('i', 7, 11, 7);
+	gameBoard.placeChar('n', 7, 12, 7);
+	gameBoard.placeChar('g', 7, 13, 7);
+
+	cout << "Board:\n" << game.getBoard().printBoard() << endl;
 
 	game.play("test", 7, 7, 7, 1, playerList.front());
 	cout << "Board: " << endl;

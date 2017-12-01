@@ -161,22 +161,24 @@ Board::Board() {
 		for(int j = 0; j < _BOARD_SIZE; j++) {
 			for(int	k = 0; k < _BOARD_SIZE; k++) {
 				int distance = abs(center - i) + abs(center - j) + abs(center - k);
-				switch(distance){
-					case 3:
-						charBoard[i][j][k] = '2';
-						break;
-					case 7:
-						charBoard[i][j][k] = '3';
-						break;
-					case 12: 
-						charBoard[i][j][k] = '4';
-						break;
-					case 18:
-						charBoard[i][j][k] = '5';
-						break;
-					default:
-						break;
-				}				
+			//	if((i * j * k) % 4 == 0 || (i * j * k) % 5 == 0) {
+					switch(distance){
+						case 3:
+							charBoard[i][j][k] = '2';
+							break;
+						case 7:
+							charBoard[i][j][k] = '3';
+							break;
+						case 12: 
+							charBoard[i][j][k] = '4';
+							break;
+						case 18:
+							charBoard[i][j][k] = '5';
+							break;
+						default:
+							break;
+					}
+			//	}				
 			}			
 		}
 	}
@@ -332,15 +334,39 @@ int Board::getMultiplier(string play, int x, int y, int z, int direction) {
  *		the other 2 directions. These will only be present if the play creates more than 1 new word.
  *
  * @param string play	The word to be played. Will have already been verified as board legal by canPlaceString
- *			Characters already on the board will be spaces here.
+ *			Characters already on the board will be spaces here. Leading and trailing spaces are not required.
  * @param int x, y, z	These refer to the starting position of the word
  * @param int direction	This tells the direction of the play. 0 is x, 1 is y, and 2 is z.
  */
 vector<string> Board::getPlayWordList(string play, int x, int y, int z, int direction) {
 	string onAxis = "";
 	//read word on axis of play, filling in spaces with characters from the board
-	//TODO: Change this so it backtracks; use private methods from above
-	for(int i = 0; i < play.length(); i++) {
+	//backtrack
+	string prefix;
+	switch(direction) {
+		case 0:
+			prefix = findWordX(play.at(0), x, y, z);
+			break;
+		case 1:
+			prefix = findWordY(play.at(0), x, y, z);
+			break;
+		case 2:
+			prefix = findWordZ(play.at(0), x, y, z);
+			break;
+		default:
+			break;
+	}
+	
+	//Our backtracking methods keep going until they hit a blank space on board. Spaces are blank spaces on the board,
+	//so we have to increment past them
+	int i = 1;
+	while(play.at(i) == ' ') {
+		i++;
+	}
+	//Add our prefix to our word.
+	onAxis += prefix;	
+	//starting at the index we found, continue to the end of the word
+	for(i; i < play.length(); i++) {
 		if(play.at(i) != ' ') {
 			onAxis += play.at(i);
 		} else {
@@ -362,6 +388,29 @@ vector<string> Board::getPlayWordList(string play, int x, int y, int z, int dire
 		}
 	}
 
+
+	//Now we need to find any suffixes if the exist on the board. 
+	char c;
+	switch(direction) {
+		case 0:
+			while((c = getChar(x + i++, y, z)) >= 'a' && c <= 'z') {
+				onAxis += c;
+			}
+			break;
+		case 1:
+			while((c = getChar(x, y + i++, z)) >= 'a' && c <= 'z') {
+				onAxis += c;
+			}
+			break;
+		case 2:
+			while((c = getChar(x, y, z + i++)) >= 'a' && c <= 'z') {
+				onAxis += c;
+			}
+			break;
+		default:
+			break;
+	}	
+
 	vector<string> wordList;
 	wordList.insert(wordList.begin(), onAxis);
 	
@@ -369,6 +418,14 @@ vector<string> Board::getPlayWordList(string play, int x, int y, int z, int dire
 	vector<string> offAxis = getOffAxisWordList(play, x, y, z, direction);
 	//Append them to our list
 	wordList.insert(wordList.end(), offAxis.begin(), offAxis.end());
+
+	/*	Testing		***************	
+	cerr << "WordList: " << endl;
+	for(i = 0; i < wordList.size(); i++) {
+		cerr << wordList.at(i) << endl;
+	}
+	**************************************/
+
 	return wordList;
 }
 
@@ -432,7 +489,7 @@ string Board::printBoard() {
 	return out;
 }
 
-/*
+/*	Testing		*************************
 int main() {
 	Board board;
 

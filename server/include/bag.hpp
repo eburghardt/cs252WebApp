@@ -9,9 +9,11 @@
 
 class Bag {
 	private:
-		
+		vector<char> tiles;
+		void add(char c, int num);
 	public:
 		Bag();
 		char getTile();
-		int getNumTiles();
+		int getNumTilesRemaining();
+		bool isEmpty();
 };
