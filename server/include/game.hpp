@@ -4,6 +4,7 @@
 #include "../include/board.hpp"
 #include "../include/dictionary.hpp"
 #include "../include/player.hpp"
+#include "../include/bag.hpp"
 
 #include <vector>
 #include <string>
