@@ -44,7 +44,7 @@ const char * usage =
 
 #define DEFAULT_PORT 65432
 
-const char * SECRET_KEY = "/test";
+const char * SECRET_KEY = "/3dword";
 
 int QueueLength = 5;
 
@@ -257,7 +257,7 @@ void processRequest(int fd) {
 	char * docType = getDocType(realFilePath);
 
 	//send response
-	const char * serverType = "Server: CS 252 lab5\n";
+	const char * serverType = "Server: CS 252 lab6\n";
 	if(realFilePath == NULL) { //not found
 		//send header meta information
 		const char * notFoundMsg = "HTTP/1.0 404 File Not Found\n";
@@ -277,7 +277,7 @@ void processRequest(int fd) {
 		free(realFilePath);
 	} else {
 		//send header meta info
-		const char * foundMsg = "HTTP/1.0 200 Document follows\n";
+		const char * foundMsg = "HTTP/1.1 200 Document follows\n";
 		write(fd, foundMsg, strlen(foundMsg));
 		write(fd, serverType, strlen(serverType));
 		write(fd, docType, strlen(docType));
@@ -309,11 +309,11 @@ char * checkFileName(char * fileName) {
 
 	if(*fileName == '\0' || !strcmp(fileName, "/")) {
 		//return index.html
-		char * filePath = realpath("./http-root-dir/htdocs/index.html", NULL);
+		char * filePath = realpath("../client/index.html", NULL);
 		return filePath;
 	}
 
-	const char * relativePath = "./http-root-dir/";
+	const char * relativePath = "../client/";
 	char * rootPath = realpath(relativePath, NULL);
 	
 	char * relativeFilePath = (char *)calloc(1024, sizeof(char));
