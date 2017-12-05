@@ -239,6 +239,8 @@ void processRequest(int fd) {
 	fileName = strndup(begin, end - begin);
 
 	if(strlen(fileName) == strlen("/favicon.ico") && !strcmp(fileName, "/favicon.ico")) {
+		printf("\n\nHERE\n\n");	
+	
 		//serve favicon.ico
 		const char * foundMsg = "HTTP/1.1 200 Document follows\n";
 		write(fd, foundMsg, strlen(foundMsg));
@@ -249,7 +251,7 @@ void processRequest(int fd) {
 		
 		//send file data
 		char c;
-		int file = open("../client/assets/favico.ico", O_RDONLY);
+		int file = open("../client/assets/favicon.ico", O_RDONLY);
 		int count;
 		while(count = read(file, &c, 1)) {
 			if(write(fd, &c, 1) != count) {
@@ -327,7 +329,7 @@ void processRequest(int fd) {
 
 //returns path to file if file resides in ./http-root-dir/ and NULL if it does not
 //If path starts with /icons/, will return path to a file in /icons/
-//Otherwise, will return path to a file in /htdocs/
+//Otherwise, will return path to a file in /client/
 char * checkFileName(char * fileName) {
 	
 
@@ -343,8 +345,10 @@ char * checkFileName(char * fileName) {
 	char * relativeFilePath = (char *)calloc(1024, sizeof(char));
 	strcat(relativeFilePath, rootPath);
 	
+	printf("Testing: %s", relativeFilePath);
+
 	if(strlen(fileName) < strlen("/icons") || strncmp(fileName, "/icons", strlen("/icons"))) {
-		strcat(relativeFilePath, "/htdocs");
+		//strcat(relativeFilePath, "/client");
 	}
 
 	strcat(relativeFilePath, fileName);
