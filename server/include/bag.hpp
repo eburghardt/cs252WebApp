@@ -1,3 +1,5 @@
+#ifndef BAG
+#define BAG
 /**
  * @file bag.hpp
  * @brief This file models a bag of tiles. Players will get tiles from here,
@@ -7,9 +9,11 @@
  * @date 11/30/2017
  */
 
+#include <vector>
+
 class Bag {
 	private:
-		vector<char> tiles;
+		std::vector<char> tiles;
 		void add(char c, int num);
 	public:
 		Bag();
@@ -17,3 +21,5 @@ class Bag {
 		int getNumTilesRemaining();
 		bool isEmpty();
 };
+
+#endif

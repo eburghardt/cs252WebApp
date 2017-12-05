@@ -167,7 +167,13 @@ int main() {
 	cout << game.getBoard().printBoard() << endl;
 
 	cout << "Score: " << playerList.front().getScore() << endl;
-	
+
+
+	//testBag
+	Bag bag = Bag();
+	while(!bag.isEmpty()) {
+		cout << bag.getTile() << endl;
+	}	
 
 	exit(0);
 }
