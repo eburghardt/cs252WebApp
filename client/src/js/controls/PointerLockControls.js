@@ -68,7 +68,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 			case 32: //space
 				this.moveUp = true;
 				break;
-			case 17: //ctrl
+			case 16: //shift
 				this.moveDown = true;
 				break;
 		}
@@ -95,7 +95,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 			case 32: //space
 				this.moveUp = false;
 				break;
-			case 17: //ctrl
+			case 16: //shift
 				this.moveDown = false;
 				break;
 		}
