@@ -42,9 +42,9 @@ const char * usage =
 #include <signal.h>
 #include <sys/wait.h>
 
-#define DEFAULT_PORT 65432
+#define DEFAULT_PORT 80 
 
-const char * SECRET_KEY = "/3dword";
+const char * SECRET_KEY = "";
 
 int QueueLength = 5;
 
@@ -265,7 +265,7 @@ void processRequest(int fd) {
 
 
 	//check for secret key in fileName
-	if(strlen(fileName) < strlen(SECRET_KEY) || strncmp(fileName, SECRET_KEY, strlen(SECRET_KEY) - 1)) {
+	if((strlen(SECRET_KEY) != 0) && (strlen(fileName) < strlen(SECRET_KEY) || strncmp(fileName, SECRET_KEY, strlen(SECRET_KEY) - 1))) {
 		
 		const char * invalidKey = "Invalid key.\n";
 		write(fd, invalidKey, strlen(invalidKey));
