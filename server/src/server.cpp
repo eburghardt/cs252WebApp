@@ -243,13 +243,13 @@ void processRequest(int fd) {
 		const char * foundMsg = "HTTP/1.1 200 Document follows\n";
 		write(fd, foundMsg, strlen(foundMsg));
 		const char * serveType = "Server CS 252 lab6\n";
-		write(fd, serveType, strlen(serveType);
+		write(fd, serveType, strlen(serveType));
 		write(fd, "Content-type: image/ico\015\012", strlen("Content-type: image/ico\015\012"));
 		write(fd, "\015\012", strlen("\015\012"));
 		
 		//send file data
 		char c;
-		int file = open("../client/assets/favico.ico");
+		int file = open("../client/assets/favico.ico", O_RDONLY);
 		int count;
 		while(count = read(file, &c, 1)) {
 			if(write(fd, &c, 1) != count) {
