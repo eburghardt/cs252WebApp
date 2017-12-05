@@ -1,5 +1,6 @@
 /**
- * @author mrdoob / http://mrdoob.com/
+ * @author Eric Burghardt
+ * @author mrdoob / http://mrdoob.com/  (MouseMove function, from library)
  */
 
 THREE.PointerLockControls = function ( camera, domElement ) {
@@ -138,13 +139,15 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 		var deltaPos = delta * this.movementSpeed;
 
 
-		if(this.moveForward || 0) this.camera.translateZ(-deltaPos);
-		if(this.moveBackward)	this.camera.translateZ(deltaPos);
-		if(this.moveLeft)	this.camera.translateX(-deltaPos);
-		if(this.moveRight)	this.camera.translateX(deltaPos);
-		if(this.moveUp)		this.camera.translateY(deltaPos);
-		if(this.moveDown)	this.camera.translateY(-deltaPos);
-		
+		if(this.moveForward) this.getObject().translateZ(-deltaPos);
+		if(this.moveBackward)	this.getObject().translateZ(deltaPos);
+		if(this.moveLeft)	this.getObject().translateX(-deltaPos);
+		if(this.moveRight)	this.getObject().translateX(deltaPos);
+		if(this.moveUp)		this.getObject().translateY(deltaPos);
+		if(this.moveDown)	this.getObject().translateY(-deltaPos);
+
+		//this.getDirection();	
+		//camera.rotation.set(camera.position.x, camera.position.y, camera.position.z);	
 	}
 	
 	this.dispose = function() {
