@@ -238,9 +238,33 @@ void processRequest(int fd) {
 	char * end = strrchr(begin, ' ');
 	fileName = strndup(begin, end - begin);
 
+	if(strlen(fileName) == strlen("/favicon.ico") && !strcmp(fileName, "/favicon.ico")) {
+		//serve favicon.ico
+		const char * foundMsg = "HTTP/1.1 200 Document follows\n";
+		write(fd, foundMsg, strlen(foundMsg));
+		const char * serveType = "Server CS 252 lab6\n";
+		write(fd, serveType, strlen(serveType);
+		write(fd, "Content-type: image/ico\015\012", strlen("Content-type: image/ico\015\012"));
+		write(fd, "\015\012", strlen("\015\012"));
+		
+		//send file data
+		char c;
+		int file = open("../client/assets/favico.ico");
+		int count;
+		while(count = read(file, &c, 1)) {
+			if(write(fd, &c, 1) != count) {
+				perror("Write");
+			}
+		}
+		write(fd, "\015\012", strlen("\015\012"));
+		close(file);
+		return;
+	}
+
+
 	//check for secret key in fileName
 	if(strlen(fileName) < strlen(SECRET_KEY) || strncmp(fileName, SECRET_KEY, strlen(SECRET_KEY) - 1)) {
-
+		
 		const char * invalidKey = "Invalid key.\n";
 		write(fd, invalidKey, strlen(invalidKey));
 		free(fileName);
