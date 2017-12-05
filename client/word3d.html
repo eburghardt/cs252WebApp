@@ -23,12 +23,14 @@
 				top: 0px;
 				width: 100%;
 				padding: 5px;
+				z-index: 1;
 			}
 			#blocker {
 				position: absolute;
 				width: 100%;
 				height: 100%;
 				background-color: rgba(0,0,0,0.5);
+				z-index: 4;
 			}
 			#instructions {
 				width: 100%;
@@ -55,6 +57,48 @@
 				vertical-align: center;			
 	
 				cursor: pointer;
+				z-index: 5;
+			}
+			#hand {
+				width: 452px;
+				height: 70px;
+				left: 50%;
+				
+
+				z-index: 2;
+	
+				color: #000000;
+				
+				background-color: #606060;
+				margin: 0 0 5px -226px;	
+				text-align: center;
+				position: fixed;
+				bottom: 0;
+				
+			}
+			#scores {
+				width: 200px;
+				height: 100%;
+				left: 50%;
+				
+
+				z-index: 2;
+	
+				color: #000000;
+				
+				margin: 5px 0 0 5px;	
+				text-align: left;
+				position: fixed;
+				top: 0;
+				left: 0;	
+			
+				/*
+				width: 100%;
+				height: 100%;
+				z-index: 3;
+				text-align: left;
+				*/
+					
 			}
 		</style>
 	</head>
@@ -70,6 +114,10 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://docs.google.com/document/d/e/2PACX-1vS6udanhjSdhS8J_GsUss8-OKq1OAdoE1MPMZ2VTvbtMmXL1o2hHHP55DFK51S-jCIixoBdUYyueXOb/pub" target="_blank" rel="noopener">Project List</a> - Word 3D<br />(left click: place, right click: remove)</div>
 
+		<div id="hand"><p>Testing</p></div>
+
+		<div id="scores"><p>Test Score: 300</p></div>
+
 		<script src="src/js/three.min.js"></script>
 		<script src="src/js/controls/PointerLockControls.js"></script>		
 		
@@ -80,6 +128,7 @@
 		<script src="src/js/Detector.js"></script>
 
 		<script src="src/js/word3d.js"></script>
+
 	</body>
 </html>
 

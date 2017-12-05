@@ -4,8 +4,6 @@ if(!Detector.webgl) {
 }
 var container;
 var camera, controls, scene, renderer;
-var cube;
-var mesh;
 var raycaster;
 var controlsEnabled;
 	
@@ -16,7 +14,7 @@ var clock = new THREE.Clock();
 
 var objects = [];
 
-var boardWidth = 15, boardDepth = 15, boardHeight = 15;
+var boardSize = 15;
 		
 var blocker = document.getElementById('blocker');
 var instructions = document.getElementById('instructions');
@@ -84,9 +82,16 @@ function init() {
 	rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
 	scene.add(rollOverMesh);
 
-	cubePosMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
-	cubePosMesh.position.y = cubePosMesh.position.y + 64;
+	var startCubeGeo = new THREE.BoxGeometry(30, 30, 30);
+	cubePosMesh = new THREE.Mesh(startCubeGeo, rollOverMaterial);
+	/*
+	cubePosMesh.position.x = gridCoorToScreenCoor(7);
+	cubePosMesh.position.y = gridCoorToScreenCoorY(7);
+	cubePosMesh.position.z = gridCoorToScreenCoor(7);
+	*/
+	setGridPosition(cubePosMesh, 7, 7, 7);
 	scene.add(cubePosMesh);	
+	objects.push(cubePosMesh);
 
 	//cubes
 	var texture = new THREE.TextureLoader().load('../../assets/a.png');
@@ -97,21 +102,53 @@ function init() {
 	cubeMaterial = new THREE.MeshLambertMaterial({map: texture});
 	
 	//grids
-	var gridHelper = new THREE.GridHelper(960, 15);
-	scene.add(gridHelper);
+	var bottomGridHelper = new THREE.GridHelper(64 * boardSize, boardSize);
+	scene.add(bottomGridHelper);
+	bottomGridHelper.position.x = 480;
+	bottomGridHelper.position.y = -960;
+	bottomGridHelper.position.z = 480;
 
-	//raycasting
-	//raycaster = new THREE.Raycaster();
-	//mouse = new THREE.Vector2();
+	var rightGridHelper = new THREE.GridHelper(64 * boardSize, boardSize);
+	rightGridHelper.position.x = 960;
+	rightGridHelper.position.y = -480;
+	rightGridHelper.position.z = 480;
+	rightGridHelper.rotateZ(Math.PI / 2);
+	scene.add(rightGridHelper);
+
+	var backGridHelper = new THREE.GridHelper(64 * boardSize, boardSize);
+	backGridHelper.position.x = 480;
+	backGridHelper.position.y = -480;
+	backGridHelper.position.x = 480;
+	backGridHelper.rotateX(Math.PI / 2);
+	scene.add(backGridHelper);
 	
+	//planes behind grids	
 	var geometry = new THREE.PlaneBufferGeometry(960, 960);
 	geometry.rotateX( - Math.PI / 2);
+	
+	bottomPlane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial( {color: 0xd0d0d0 }));
+	scene.add(bottomPlane);
+	bottomPlane.position.copy(bottomGridHelper.position);
+	bottomPlane.position.y -= 1;
 
-	plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial( {visible: false }));
-	scene.add(plane);
+	rightPlane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: 0xd0d0d0} ));
+	scene.add(rightPlane);
+	rightPlane.position.copy(rightGridHelper.position);
+	rightPlane.position.x += 1;
+	rightPlane.rotateZ(Math.PI / 2);
+
+
+	backPlane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: 0xd0d0d0} ));
+	scene.add(backPlane);
+	backPlane.position.copy(backGridHelper.position);
+	backPlane.position.z -= 1;
+	backPlane.rotateX(Math.PI / 2);
+	//plane.position.y = bottomGridHelper.position.y;
+	//plane.position.z = bottomGridHelper.position.z;
 	
-	objects.push(plane);
-	
+	//objects.push(plane);
+		
+
 	controls = new THREE.PointerLockControls(camera);
 	
 	controls.movementSpeed = 1000;
@@ -167,10 +204,7 @@ function onDocumentMouseMove(event) {
 	raycaster.ray.direction.copy(direction);
 	raycaster.ray.origin.copy(controls.getObject().position);
 	console.log(raycaster.ray.direction);
-	/*
-	vector.sub(controls.getObject().position); //Vector is now a unit vector with same direction as camera
-	raycaster = new THREE.Raycaster(controls.getObject().position, vector);
-	*/
+	
 	var intersects = raycaster.intersectObjects(objects);
 	
 	if(intersects.length > 0) {
@@ -194,10 +228,38 @@ function onDocumentClick(event) {
 			var voxel = new THREE.Mesh(cubeGeo, cubeMaterial);
 			voxel.position.copy(intersect.point).add(intersect.face.normal);
 			voxel.position.divideScalar(64).floor().multiplyScalar(64).addScalar(32);
-			scene.add(voxel);
-			objects.push(voxel);
+			//check that position is in bounds
+			var gridX = screenCoorToGridCoor(voxel.position.x);
+			var gridY = screenCoorToGridCoor(voxel.position.y);
+			var gridZ = screenCoorToGridCoor(voxel.position.z);
+			console.log("Block coordinates: " + gridX + " " + gridY + " " + gridZ);
+			if(!(gridX < 0 || gridX >= boardSize || gridY < 0 || gridY >= boardSize || gridZ < 0 || gridZ >= boardSize)) {
+				//in bounds, add to screen
+				scene.add(voxel);
+				objects.push(voxel);
+			}
 		}
 	}				
+}
+
+//Takes an integer as input. Y is inverted, so use gridCoorToScreenCoorY
+function gridCoorToScreenCoor(x) {
+	return (x * 64) + 32;
+}
+
+function gridCoorToScreenCoorY(y) {
+	return -1 * gridCoorToScreenCoor(y);
+}
+
+
+function screenCoorToGridCoor(x) {
+	return (Math.abs(x) - 32) / 64;
+}
+
+function setGridPosition(cube, x, y, z) {
+	cube.position.x = gridCoorToScreenCoor(x);
+	cube.position.y = gridCoorToScreenCoorY(x);
+	cube.position.z = gridCoorToScreenCoor(x);
 }
 
 function animate() {
