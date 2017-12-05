@@ -139,15 +139,16 @@ void Game::startGame() {
 	
 }
 
+/*
 int main() {
 	Board board = Board();
 	board.placeString("test", 7, 7, 7, 1);
 	cout << board.printBoard() << endl;
 
-	Player player1 = Player();
-	Player player2 = Player();
+//	Player player1 = Player();
+//	Player player2 = Player();
 
-	player1.setScore(100);
+//	player1.setScore(100);
 	cout << player1.getScore() << endl;
 	vector<Player> playerList = {player1, player2};
 	//players.insert(players.end(), player1);
@@ -177,3 +178,4 @@ int main() {
 
 	exit(0);
 }
+*/

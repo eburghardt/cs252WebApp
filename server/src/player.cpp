@@ -1,8 +1,11 @@
 
 #include "../include/player.hpp"
 
-Player::Player() {
+using namespace std;
+
+Player::Player(int port) {
 	score = 0;
+	this->port = port;
 }
 
 std::vector<char> Player::getHand() {
@@ -27,4 +30,12 @@ void Player::setScore(int score) {
 
 void Player::addToScore(int points) {
 	score += points;
+}
+
+string Player::toString() {
+	string out = "Score: ";
+	out += to_string(this->score);
+	out += "\nPort: ";
+	out += to_string(this->port);
+	return out;
 }
