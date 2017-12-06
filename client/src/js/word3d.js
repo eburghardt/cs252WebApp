@@ -48,6 +48,7 @@ var threeMesh = new THREE.MeshLambertMaterial({map: threeTexture});
 
 var numTiles = 1470;
 
+var port;
 
 var blocker = document.getElementById('blocker');
 var instructions = document.getElementById('instructions');
@@ -102,10 +103,9 @@ init();
 animate();
 
 function init() {
-	
-	//Open websocket connection
-	ws = new WebSocket("ws://165.227.181.230:3000");
 
+	getPort("http://165.227.181.230/port", initializePort);	
+	
 	container = document.getElementById('container');
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
 	//camera.position.y = getY(7, 7) * 100 + 100;
@@ -122,6 +122,9 @@ function init() {
 	rollOverMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, opacity: 0.5, transparent: true});
 	rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
 	scene.add(rollOverMesh);
+
+	//place multipliers
+	placeMultipliers();
 
 	var startCubeGeo = new THREE.BoxGeometry(30, 30, 30);
 	startCubeMesh = new THREE.Mesh(startCubeGeo, rollOverMaterial);
@@ -260,9 +263,6 @@ function init() {
 	window.addEventListener('resize', onWindowResize, false);
 }
 
-function getY(x, z) {
-	return 10;
-}
 
 function onWindowResize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
@@ -664,22 +664,12 @@ function sendPlay() {
 			ws.send("play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":0\n");
 		}
 	} else {
-		ws.send("play:" + newPlay[0].character + ":" +  screenCoorToGridCoor(newPlay[0].position.x) + ":" + screenCoorToGridCoorY(newPlay[0].position.y) + ":" + screenCoorToGridCoor(newPlay[0].position.z) + ":0\n"); 
+		ws.send("play:" + " " + newPlay[0].character + " " + ":" +  screenCoorToGridCoor(newPlay[0].position.x) + ":" + screenCoorToGridCoorY(newPlay[0].position.y) + ":" + screenCoorToGridCoor(newPlay[0].position.z) + ":0\n"); 
+		ws.send("play:" + " " + newPlay[0].character + " " + ":" +  screenCoorToGridCoor(newPlay[0].position.x) + ":" + screenCoorToGridCoorY(newPlay[0].position.y) + ":" + screenCoorToGridCoor(newPlay[0].position.z) + ":1\n"); 
+		ws.send("play:" + " " + newPlay[0].character + " " + ":" +  screenCoorToGridCoor(newPlay[0].position.x) + ":" + screenCoorToGridCoorY(newPlay[0].position.y) + ":" + screenCoorToGridCoor(newPlay[0].position.z) + ":2\n"); 
 	}
 }
 
-//Websocket functions
-ws.onopen = function() {
-	ws.send("Connected");
-};
-
-ws.onmessage = function(event) {
-	var received = event.data;
-	console.log(received);
-
-	parseMessageType(received);
-	
-};
 
 function parseMessageType(message) {
 	console.log(typeof message);
@@ -701,9 +691,9 @@ function parseMessageType(message) {
 		numTiles = message.slice(6);	
 		setRemainingTilesIndicator(numTiles);	
 	} else if(message.indexOf("hand") !== -1) {
-		//message format: "hand:<7 characters>\n"
+		//message format: "hand:<7 characters>"
 		//console.log("New hand: " + message.substring(5, 12));
-		setHand(message.substring(5, 12));	
+		setHand(message.slice(5));	
 	} else if(message.indexOf("denied") !== -1) {
 		//message format: "denied:reason\n
 		console.log("Reason: " + message.slice(7));
@@ -801,7 +791,82 @@ function playString(string){
 //	playStringRecursive(play, x, y, z, dir);	
 }
 
+function getPort(theUrl, callback) {
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onreadystatechange = function() {
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200)
+			callback(xmlHttp.responseText);
+	}
+	xmlHttp.open("GET", "https://cors-anywhere.herokuapp.com/" + theUrl, true); //true for asynchronous
+	xmlHttp.send(null);
+}
 
+
+function initializePort(response) {
+	console.log(response);
+
+	console.log("ws://165.227.181.230:" + response);
+	
+	//Open websocket connection
+	ws = new WebSocket("ws://165.227.181.230:" + response);
+
+	//Websocket functions
+	ws.onopen = function() {
+		ws.send("Connected");
+	};
+
+	ws.onmessage = function(event) {
+		var received = event.data;
+		console.log(received);
+
+		parseMessageType(received);
+	
+	};
+
+}
+
+function placeMultipliers() {
+	var multiplierCubeGeo = new THREE.BoxGeometry(5, 5, 5);
+	
+	x2Material = new THREE.MeshBasicMaterial( {color: 0x0000aa, opacity: 0.5, transparent: true});
+	
+	x3Material = new THREE.MeshBasicMaterial( {color: 0xaa00aa, opacity: 0.5, transparent: true});
+	x4Material = new THREE.MeshBasicMaterial( {color: 0xccaa00, opacity: 0.5, transparent: true});
+	x5Material = new THREE.MeshBasicMaterial( {color: 0x00dda0, opacity: 0.5, transparent: true});
+
+	var newCube;
+	for(i = 0; i < boardSize; i++) {
+		for(j = 0; j < boardSize; j++) {
+			for(k = 0; k < boardSize; k++) {
+				var distance = Math.abs(7 - i) + Math.abs(7 - j) + Math.abs(7 - k);
+				switch(distance) {
+					case 3:
+						newCube = new THREE.Mesh(multiplierCubeGeo, x2Material);
+						setGridPosition(newCube, i, j, k);
+						scene.add(newCube);
+						break;
+					case 7:
+						newCube = new THREE.Mesh(multiplierCubeGeo, x3Material);
+						setGridPosition(newCube, i, j, k);
+						scene.add(newCube);					
+						break;
+					case 12:
+						newCube = new THREE.Mesh(multiplierCubeGeo, x4Material);
+						setGridPosition(newCube, i, j, k);
+						scene.add(newCube);					
+						break;
+					case 18:
+						newCube = new THREE.Mesh(multiplierCubeGeo, x5Material);
+						setGridPosition(newCube, i, j, k);
+						scene.add(newCube);					
+						break;
+
+				}
+			}
+		}
+	}
+
+}
 function animate() {
 	requestAnimationFrame(animate);
 	

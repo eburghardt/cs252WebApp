@@ -41,12 +41,16 @@ const char * usage =
 #include <pthread.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <string>
+#include <iostream>
 
 #define DEFAULT_PORT 80 
 
 const char * SECRET_KEY = "";
 
 int QueueLength = 5;
+
+int returnPort = 8081;
 
 //Process file request
 void processRequest(int socket);
@@ -238,6 +242,56 @@ void processRequest(int fd) {
 	char * end = strrchr(begin, ' ');
 	fileName = strndup(begin, end - begin);
 
+	//check for cgi-bin vars
+	char * cgiBinVars = NULL;
+	if(strchr(fileName, '?')) {
+		cgiBinVars = strchr(fileName, '?') + 1;
+		*(cgiBinVars - 1) = '\0';
+	}
+
+	if(strlen(fileName) == strlen("/port") && !strcmp(fileName, "/port")) {	
+		printf("\n\nPort request received\n\n");
+
+		const char * foundMsg = "HTTP/1.1 200 Document follows\n";
+		write(fd, foundMsg, strlen(foundMsg));
+		const char * serveType = "Server CS 252 lab6\n";
+		write(fd, serveType, strlen(serveType));	
+		const char * allowOrigin = "Access-Control-Allow-Origin: *\n";
+		write(fd, allowOrigin, strlen(allowOrigin));
+		write(fd, "Content-type: text/plain\015\012", strlen("Content-type: text/plain\015\012"));
+		write(fd, "\015\012", strlen("\015\012"));
+		
+		//spawn the game server
+		int ret = fork();
+		if(ret == 0) {
+			//child
+			char portStr[7];
+			sprintf(portStr, "%d", returnPort);
+			char ** argv = (char **) malloc(3 * sizeof(char *));
+			if(cgiBinVars)
+				*argv = cgiBinVars + 9;
+			else
+				*argv = strdup("Nickname");
+			*(argv + 1) = (char *)&portStr;
+			*(argv + 2) = NULL;
+			
+			execvp("../bin/game", argv);
+		}
+	
+		//parent
+
+		//send data
+		std::string send = std::to_string(returnPort);
+		returnPort++;
+		std::cout << send << std::endl;
+		write(fd, send.c_str(), send.length());
+		write(fd, "\015\012", strlen("\015\012"));
+	
+		close(fd);
+		free(fileName);
+		return;
+	}
+
 	if(strlen(fileName) == strlen("/favicon.ico") && !strcmp(fileName, "/favicon.ico")) {
 		printf("\n\nHERE\n\n");	
 	
@@ -259,17 +313,12 @@ void processRequest(int fd) {
 			}
 		}
 		write(fd, "\015\012", strlen("\015\012"));
+		free(fileName);
 		close(file);
 		return;
 	}
 
-	//check for cgi-bin vars
-	char * cgiBinVars = NULL;
-	if(strchr(fileName, '?')) {
-		cgiBinVars = strchr(fileName, '?') + 1;
-		*(cgiBinVars - 1) = '\0';
-	}
-
+	
 
 
 	//check for secret key in fileName

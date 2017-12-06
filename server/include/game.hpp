@@ -12,7 +12,7 @@
 class Game {
 	private:
 		std::vector<Player> players;
-		Board board;
+		Board * board;
 		Dictionary dictionary;
 		Bag bag;		
 
@@ -27,7 +27,7 @@ class Game {
 		Board getBoard();
 
 		void startGame();
-
+		
 		std::string getScores();
 		std::string getTurn();
 		std::string getNumTiles();

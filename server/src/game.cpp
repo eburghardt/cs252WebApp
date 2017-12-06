@@ -76,14 +76,14 @@ int Game::getWordValue(string play) {
 // @param numPlayers = number of players
 // @param players = pointer to array of player pointers
 Game::Game(vector<Player> players) {
-	board = Board();
+	board = new Board;
 	dictionary = Dictionary("./assets/dictionary.txt");
 	bag = Bag();
 	this->players = players;	
 }
 
 int Game::getPlayValue(string play, int x, int y, int z, int direction) {
-	int multiplier = board.getMultiplier(play, x, y, z, direction);
+	int multiplier = board->getMultiplier(play, x, y, z, direction);
 	int base = getWordValue(play);
 	return multiplier * base;
 }		
@@ -103,12 +103,12 @@ int Game::getPlayValue(string play, int x, int y, int z, int direction) {
  */
 bool Game::play(string play, int x, int y, int z, int direction, Player &player) {
 	//Check legality of play
-	if(!board.canPlaceString(play, x, y, z, direction)) {
+	if(!(board->canPlaceString(play, x, y, z, direction))) {
 		return false;
 	}
 	
 	//Check that all words are legal
-	vector<string> wordList = board.getPlayWordList(play, x, y, z, direction);
+	vector<string> wordList = board->getPlayWordList(play, x, y, z, direction);
 	vector<string>::iterator it;
 	for(it = wordList.begin(); it < wordList.end(); it++) {
 		if(!dictionary.isWord(*it)) {
@@ -117,7 +117,7 @@ bool Game::play(string play, int x, int y, int z, int direction, Player &player)
 	}
 
 	//Play is legal. Add score and place it on the board
-	int multiplier = board.getMultiplier(play, x, y, z, direction);
+	int multiplier = board->getMultiplier(play, x, y, z, direction);
 	int score = 0;
 	for(it = wordList.begin(); it < wordList.end(); it++) {
 		score += getWordValue(*it);
@@ -127,13 +127,13 @@ bool Game::play(string play, int x, int y, int z, int direction, Player &player)
 
 	cout << "Calculated score: " << score * multiplier << endl;
 	
-	board.placeString(play, x, y, z, direction);
+	board->placeString(play, x, y, z, direction);
 
 	return true;	
 }
 
 Board Game::getBoard() {
-	return board;
+	return *board;
 }
 
 void Game::startGame() {

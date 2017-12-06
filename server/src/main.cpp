@@ -16,6 +16,8 @@ int main(int argc, char ** argv) {
 		exit(1);		
 	}
 
+	cout << "Here 1" << endl;
+
 	int numPlayers = (argc - 1) / 2;
 	int ports[numPlayers];
 	string playerNames[numPlayers];
@@ -26,15 +28,21 @@ int main(int argc, char ** argv) {
 		index++;
 	}
 
+	cout << "Here 2" << endl;
+
 	vector<Player> players;
 	for(int i = 0; i < numPlayers; i++) {
 		Player player = Player(playerNames[i], ports[i]);
 		players.insert(players.end(), player);
 		cout << player.toString() << endl;
 	}
-	
 
-	
+	cout << "Here 3" << endl;	
+
+	game = new Game(players);
+
+	createThread(players.at(0));		
+	while(1);
 }
 
 void createThread(Player player) {
@@ -50,6 +58,13 @@ void createHub(Player * playerP) {
 	Player player = *playerP;	
 
 	string portStr = to_string(player.getPort());
+
+	cout << portStr << endl;
+	
+	h.onConnection([](uWS::WebSocket<uWS::CLIENT> * ws, uWS::HttpRequest req) {
+		cout << "Here" << endl;
+	});	
+
 	h.onMessage([&game, &player](uWS::WebSocket<uWS::SERVER> * ws, char * message, size_t length, uWS::OpCode opCode) {
 		//parse message type
 		string mess = string(message);
@@ -91,6 +106,8 @@ void createHub(Player * playerP) {
 			
 			if(success) {
 				ws->send(message, length, opCode);
+			//	const char * newHand = "hand:newhand\n"; 
+			//	ws->send(newHand, sizeof(newHand), opCode);
 			} else {
 				ws->send("Denied: Illegal\n", sizeof("Denied: Illegal\n"), opCode);
 			}
@@ -98,5 +115,8 @@ void createHub(Player * playerP) {
 		
 	});
 
+	if(h.listen(player.getPort()))
+		h.run();
+	
 }
 
