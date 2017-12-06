@@ -599,7 +599,7 @@ function sendPlay() {
 			}
 			console.log(string);		
 
-			ws.send("Play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":0\n");
+			ws.send("play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":2\n");
 		} else if(firstx == secondx && firstz == secondz) {
 			//for each remaining element in new play, make sure they have the appropriate x and z
 			for(i = 2; i < newPlay.length; i++) {
@@ -631,7 +631,7 @@ function sendPlay() {
 			}
 			console.log(string);	
 
-			ws.send("Play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":1\n");
+			ws.send("play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":1\n");
 		} else if (firsty == secondy && firstz == secondz){
 			//for each remaining element in new play, make sure they have the appropriate y and z
 			for(i = 2; i < newPlay.length; i++) {
@@ -661,7 +661,7 @@ function sendPlay() {
 				lastpos = screenCoorToGridCoor(newPlayCopy[i].position.x);
 			}
 			console.log(string);	
-			ws.send("Play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":2\n");
+			ws.send("play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":0\n");
 		}
 	} else {
 		ws.send("Play:" + newPlay[0].character + ";" +  newPlay[0].position.x + ";" + newPlay[0].position.y + ";" + newPlay[0].position.z + ";0\n"); 
