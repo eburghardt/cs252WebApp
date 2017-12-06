@@ -1,1 +1,7 @@
 Welcome to the repository for my CS252 class.
+
+Word3D - a WIP 3-dimensional Scrabble-analog
+
+Technologies and libraries:
+	three.js
+	uWebSockets
