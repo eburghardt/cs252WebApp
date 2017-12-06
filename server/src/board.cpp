@@ -271,6 +271,10 @@ bool Board::canPlaceString(string play, int x, int y, int z, int direction) {
 		}
 	}
 
+	//If x,y,z is the center point, it crosses an existing word
+	if(getChar(x, y, z) == '*') {
+		crossesExisting = true;
+	}
 
 	if(x < 0 || x >= _BOARD_SIZE || y < 0 || y >= _BOARD_SIZE || z < 0 || z >= _BOARD_SIZE) {
 		//out of bounds
