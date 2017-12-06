@@ -385,7 +385,6 @@ function onDocumentKeyDown(event) {
 		case 49: //numrow 1
 		case 97: //numpad 1
 			newHandSelect = 0;
-			console.log(1);
 			break;
 		case 50: //numrow 2
 		case 98: //numpad 2
@@ -671,7 +670,7 @@ function sendPlay() {
 
 //Websocket functions
 ws.onopen = function() {
-	ws.send("Connected");
+	//ws.send("Connected");
 };
 
 ws.onmessage = function(event) {
@@ -684,8 +683,11 @@ ws.onmessage = function(event) {
 
 function parseMessageType(message) {
 	console.log(typeof message);
-	if(message.indexOf("board") !== -1) {
-		//message format: "board:"
+	console.log(message.indexOf("play") !== -1);
+	if(message.indexOf("play") !== -1) {
+		//message format: "play:<string>:x:y:z:direction"
+		clearNewPlay();
+		playString(message.slice(5));
 
 	} else if(message.indexOf("scores") !== -1) {
 		//message format: "scores;playername: score;playername:score...\n"
@@ -706,6 +708,9 @@ function parseMessageType(message) {
 		//message format: "denied:reason\n
 		console.log("Reason: " + message.slice(7));
 		illegalPlay(message.slice(7));
+	} else if(message.indexOf("board") !== -1) {
+		//message format: "board:"
+		
 	}
 }
 
@@ -743,6 +748,59 @@ function setRemainingTilesIndicator(numTiles) {
 	var tilesText = document.getElementById('tilestext');
 	tilesText.innerHTML = "Remaining tiles: " + numTiles;
 }
+
+function clearNewPlay() {
+	for(i = 0; i < newPlay.length; i++) {
+		handchars += newPlay[i].character;
+		scene.remove(newPlay[i]);
+		scene.remove(newPlayHighlights[i]);	
+	}
+	newPlay = [];
+	newPlayHighlights = [];
+	drawHand();
+}
+
+function playString(string){
+	var parts = string.split(":");
+	var play = parts[0];
+	var x = parseInt(parts[1]);
+	var y = parseInt(parts[2]);
+	var z = parseInt(parts[3]);
+	var dir = parseInt(parts[4]);
+
+	console.log(play + " " + x + " "+ y + " "+ z + " " + dir);
+
+	switch(dir) {
+		case 0:
+			for(i = 0; i < play.length; i++) {
+				if(play[i].charCodeAt() >= 'a'.charCodeAt() && play[i].charCodeAt() <= 'z'.charCodeAt()) {
+					createCube(play[i], x + i, y, z);					
+				}
+			}
+			break;
+		case 1:
+			for(i = 0; i < play.length; i++) {
+
+				if(play[i].charCodeAt() >= 'a'.charCodeAt() && play[i].charCodeAt() <= 'z'.charCodeAt()) {
+					console.log("here");
+					createCube(play[i], x, y + i, z);					
+				}
+			}
+			break;
+		case 2:
+			for(i = 0; i < play.length; i++) {
+				if(play[i].charCodeAt() >= 'a'.charCodeAt() && play[i].charCodeAt() <= 'z'.charCodeAt()) {
+					createCube(play[i], x, y, z + i);					
+				}
+			}
+
+			break;
+	}
+
+
+//	playStringRecursive(play, x, y, z, dir);	
+}
+
 
 function animate() {
 	requestAnimationFrame(animate);
