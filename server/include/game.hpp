@@ -14,7 +14,8 @@ class Game {
 		std::vector<Player> players;
 		Board board;
 		Dictionary dictionary;
-		
+		Bag bag;		
+
 		int getLetterValue(char c);
 		int getWordValue(std::string play);	
 
@@ -26,6 +27,10 @@ class Game {
 		Board getBoard();
 
 		void startGame();
+
+		std::string getScores();
+		std::string getTurn();
+		std::string getNumTiles();
 };
 
 #endif

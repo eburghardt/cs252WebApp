@@ -6,3 +6,13 @@
  */
 
 #include "../include/game.hpp"
+#include "../include/game.hpp"
+#include <uWS/uWS.h>
+#include <iostream>
+#include <vector>
+#include <pthread.h>
+
+Game * game;
+
+void createThread(Player player);
+void createHub(Player * player);

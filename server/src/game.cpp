@@ -78,6 +78,7 @@ int Game::getWordValue(string play) {
 Game::Game(vector<Player> players) {
 	board = Board();
 	dictionary = Dictionary("./assets/dictionary.txt");
+	bag = Bag();
 	this->players = players;	
 }
 
@@ -137,6 +138,25 @@ Board Game::getBoard() {
 
 void Game::startGame() {
 	
+}
+
+string Game::getScores() {
+	string out = "scores;";
+	for(int i = 0; i < players.size(); i++) {
+		out += players.at(i).getName();
+		out += ": ";
+		out += players.at(i).getScore();
+		out += ";";
+	}
+	return out;
+}
+
+string Game::getTurn() {
+	return "";
+}
+
+string Game::getNumTiles() {
+	return "" + bag.getNumTilesRemaining();
 }
 
 /*
