@@ -670,7 +670,7 @@ function sendPlay() {
 
 //Websocket functions
 ws.onopen = function() {
-	//ws.send("Connected");
+	ws.send("Connected");
 };
 
 ws.onmessage = function(event) {
@@ -690,7 +690,7 @@ function parseMessageType(message) {
 		playString(message.slice(5));
 
 	} else if(message.indexOf("scores") !== -1) {
-		//message format: "scores;playername: score;playername:score...\n"
+		//message format: "scores;playername: score;playername: score...\n"
 		setScores(message.slice(7));
 	} else if(message.indexOf("turn") !== -1) {
 		//message format: "turn:true/false:playername\n"
