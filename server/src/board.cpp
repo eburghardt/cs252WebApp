@@ -233,12 +233,48 @@ char Board::getChar(int x, int y, int z) {
 //	1 => y+
 //	2 => z+
 bool Board::canPlaceString(string play, int x, int y, int z, int direction) {
-	if(play.length() == 0) {
-		return true;
+	static bool crossesExisting = false;
+
+	switch(direction) {
+		char prevChar;
+		case 0:
+			prevChar = getChar(x - 1, y, z);
+			if(prevChar >= 'a' && prevChar <= 'z')
+				crossesExisting = true;
+			break;
+		case 1:
+			prevChar = getChar(x, y - 1, z);
+			if(prevChar >= 'a' && prevChar <= 'z')
+				crossesExisting = true;
+			break;
+		case 2:
+			prevChar = getChar(x, y, z - 1);
+			if(prevChar >= 'a' && prevChar <= 'z')
+				crossesExisting = true;
+			break;
 	}
+
+	if(play.length() == 0) {
+		if(!crossesExisting) {
+			//Have not crossed an existing word, yet. Character pointed to now must be alphabetical for
+			//play to be legal
+			char c = getChar(x, y, z);
+			if(c >= 'a' && c <= 'z')
+				crossesExisting = true;
+		}
+		if(crossesExisting) {
+			//reset for next method call
+			crossesExisting = false;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 
 	if(x < 0 || x >= _BOARD_SIZE || y < 0 || y >= _BOARD_SIZE || z < 0 || z >= _BOARD_SIZE) {
 		//out of bounds
+		crossesExisting = false;
 		return false;
 	}
 			
@@ -247,16 +283,19 @@ bool Board::canPlaceString(string play, int x, int y, int z, int direction) {
 		//by an alphabetic character
 		if(isOpen(x, y, z)) {
 			//space is not alphabetical
+			crossesExisting = false;
 			return false;
 		} 
 	} else if(play.at(0) >= 'a' && play.at(0) <= 'z') {
 		//First character is [a-z], space must be open
 		if(!isOpen(x, y, z)) {
 			//Space is already occupied by a character [a-z]
+			crossesExisting = false;
 			return false;
 		}
 	} else {
 		//invalid character in the string
+		crossesExisting = false;
 		return false;
 	}
 
@@ -272,6 +311,7 @@ bool Board::canPlaceString(string play, int x, int y, int z, int direction) {
 			break;
 		default:
 			//invalid direction
+			crossesExisting = false;
 			return false;
 			break;
 	}
