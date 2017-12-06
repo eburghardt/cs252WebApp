@@ -263,6 +263,14 @@ void processRequest(int fd) {
 		return;
 	}
 
+	//check for cgi-bin vars
+	char * cgiBinVars = NULL;
+	if(strchr(fileName, '?')) {
+		cgiBinVars = strchr(fileName, '?') + 1;
+		*(cgiBinVars - 1) = '\0';
+	}
+
+
 
 	//check for secret key in fileName
 	if((strlen(SECRET_KEY) != 0) && (strlen(fileName) < strlen(SECRET_KEY) || strncmp(fileName, SECRET_KEY, strlen(SECRET_KEY) - 1))) {
