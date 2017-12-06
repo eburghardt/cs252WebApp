@@ -30,7 +30,7 @@
 				width: 100%;
 				height: 100%;
 				background-color: rgba(0,0,0,0.5);
-				z-index: 4;
+				z-index: 6;
 			}
 			#instructions {
 				width: 100%;
@@ -57,10 +57,10 @@
 				vertical-align: center;			
 	
 				cursor: pointer;
-				z-index: 5;
+				z-index: 7;
 			}
 			#hand {
-				width: 452px;
+				width: 480px;
 				height: 70px;
 				left: 50%;
 				
@@ -70,11 +70,21 @@
 				color: #000000;
 				
 				background-color: #606060;
-				margin: 0 0 5px -226px;	
+				margin: 0 0 15px -240px;	
 				text-align: center;
 				position: fixed;
 				bottom: 0;
 				
+			}
+			#handSelect {
+				width: 480px;
+				height: 15px;
+				left: 50%;
+				z-index: 3;
+				background-color: #ffffff;
+				margin: 0 0 0 -240px;
+				position: fixed;
+				bottom: 0;
 			}
 			#scores {
 				width: 200px;
@@ -82,7 +92,7 @@
 				left: 50%;
 				
 
-				z-index: 2;
+				z-index: 4;
 	
 				color: #000000;
 				
@@ -100,6 +110,18 @@
 				*/
 					
 			}
+			#crosshair {
+				width: 9px;
+				height: 9px;
+				position: fixed;
+				z-index: 5;
+				left: 49.5%;
+				right: 50%;
+				top: 49.5%;
+				bottom: 50%;
+				color: #000000;
+				margin: -5px 5px 0 0;
+			}
 		</style>
 	</head>
 	<body>
@@ -112,11 +134,14 @@
 		</div>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://docs.google.com/document/d/e/2PACX-1vS6udanhjSdhS8J_GsUss8-OKq1OAdoE1MPMZ2VTvbtMmXL1o2hHHP55DFK51S-jCIixoBdUYyueXOb/pub" target="_blank" rel="noopener">Project List</a> - Word 3D<br />(left click: place, right click: remove)</div>
+		<div id="info"><a href="https://docs.google.com/document/d/e/2PACX-1vS6udanhjSdhS8J_GsUss8-OKq1OAdoE1MPMZ2VTvbtMmXL1o2hHHP55DFK51S-jCIixoBdUYyueXOb/pub" target="_blank" rel="noopener">Project List</a> - Word 3D<br />(left click: place, right click: remove, number keys: select letter, enter: play word)</div>
 
-		<div id="hand"><p>Testing</p></div>
+		<div id="hand"><table><tr id="handtable"><td> </td> <td> </td> <td> </td> <td> </td> <td> </td> <td> </td> <td> </td></tr></table></div>
+		<div id="handSelect"><table><tr id="handselecttable"><td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td></tr></table></div>
 
 		<div id="scores"><p>Test Score: 300</p></div>
+
+		<div id="crosshair"><img src="../../assets/crosshair.png"></div>
 
 		<script src="src/js/three.min.js"></script>
 		<script src="src/js/controls/PointerLockControls.js"></script>		
