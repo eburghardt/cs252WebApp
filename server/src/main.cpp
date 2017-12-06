@@ -7,17 +7,12 @@
  */
 
 #include "../include/main.hpp"
-#include "../include/game.hpp"
-#include <uWS/uWS.h>
-#include <iostream>
-#include <vector>
-#include <pthread.h>
 
 using namespace std;
 int main(int argc, char ** argv) {
 	//main player1Name player1port player2Name player2Port
-	if(argc < 5) {
-		cerr << "Error: not enough arguments. Need at least 2 players" << endl;
+	if(argc < 3) {
+		cerr << "Error: not enough arguments. Need at least 1 player" << endl;
 		exit(1);		
 	}
 
@@ -47,14 +42,15 @@ void createThread(Player player) {
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-	pthread_create(&thread, &attr, (void *(*)(void*))createHub, (void *) player.getPort());
+	pthread_create(&thread, &attr, (void *(*)(void*))createHub, (void *) &player);
 }
 
-void createHub(int port) {
+void createHub(Player * playerP) {
 	uWS::Hub h;
-	
-	string portStr = to_string(port);
-	h.onMessage([port](uWS::WebSocket<uWS::SERVER> * ws, char * message, size_t length, uWS::OpCode opCode) {
+	Player player = *playerP;	
+
+	string portStr = to_string(player.getPort());
+	h.onMessage([&game, &player](uWS::WebSocket<uWS::SERVER> * ws, char * message, size_t length, uWS::OpCode opCode) {
 		//parse message type
 		string mess = string(message);
 		//connect
@@ -64,15 +60,15 @@ void createHub(int port) {
 			string hand = "";
 			string numTiles = "";
 			
-			scores = getScores();
-			turn = getTurn();
-			hand = getHand(port);
-			numTiles = getNumTiles();
+			scores += game->getScores();
+			turn += game->getTurn();
+			hand += player.getHandString();
+			numTiles += game->getNumTiles();
 
-			ws->send(scores, sizeof(scores), opCode);
-			ws->send(turn, sizeof(turn), opCode);
-			ws->send(hand, sizeof(hand), opCode);
-			ws->send(numTiles, sizeof(numTiles), opCode);
+			ws->send(scores.c_str(), sizeof(scores.c_str()), opCode);
+			ws->send(turn.c_str(), sizeof(turn.c_str()), opCode);
+			ws->send(hand.c_str(), sizeof(hand.c_str()), opCode);
+			ws->send(numTiles.c_str(), sizeof(numTiles.c_str()), opCode);
 		} else if(mess.substr(0, 5) == "play:") {
 			size_t pos = mess.find(":");
 			mess.erase(0, pos + 1);
@@ -104,18 +100,3 @@ void createHub(int port) {
 
 }
 
-string getScores() {
-	
-}
-
-string getTurn() {
-	
-}
-
-string getNumTiles() {
-	
-}
-
-string getHand(int port) {
-
-}
