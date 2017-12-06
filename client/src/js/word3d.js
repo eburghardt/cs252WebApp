@@ -664,7 +664,7 @@ function sendPlay() {
 			ws.send("play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":0\n");
 		}
 	} else {
-		ws.send("Play:" + newPlay[0].character + ";" +  newPlay[0].position.x + ";" + newPlay[0].position.y + ";" + newPlay[0].position.z + ";0\n"); 
+		ws.send("play:" + newPlay[0].character + ":" +  screenCoorToGridCoor(newPlay[0].position.x) + ":" + screenCoorToGridCoorY(newPlay[0].position.y) + ":" + screenCoorToGridCoor(newPlay[0].position.z) + ":0\n"); 
 	}
 }
 
