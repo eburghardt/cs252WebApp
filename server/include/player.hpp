@@ -2,15 +2,15 @@
 #define PLAYER
 
 #include <vector>
-
+#include <string>
 
 class Player {
 	private:
 		std::vector<char> hand;
 		int score;
-	
+		int port;	
 	public:
-		Player();
+		Player(int port);
 		
 		std::vector<char> getHand();
 		int getHandSize();
@@ -19,6 +19,7 @@ class Player {
 		int getScore();
 		void setScore(int score);
 		void addToScore(int points);
+		std::string toString();
 };
 
 #endif
