@@ -23,7 +23,7 @@
 				top: 0px;
 				width: 100%;
 				padding: 5px;
-				z-index: 1;
+				z-index: 8;
 			}
 			#blocker {
 				position: absolute;
@@ -54,7 +54,6 @@
 				
 				color: #ffffff;
 				text-align: center;
-				vertical-align: center;			
 	
 				cursor: pointer;
 				z-index: 7;
@@ -122,9 +121,63 @@
 				color: #000000;
 				margin: -5px 5px 0 0;
 			}
+			#denied {
+				width: 100%;
+				height: 100%;
+
+				color: #000000;
+				background-color: #ff0000;
+				
+				display: -webkit-box;
+				display: -moz-box;
+				display: box;
+			
+				-webkit-box-orient: horizontal;
+				-moz-box-orient: horizontal;
+				box-orient: horizontal;
+
+				-webkit-box-pack: center;
+				-moz-box-pack: center;
+				box-pack: center;
+
+				-webkit-box-align: center;
+				-moz-box-align: center;
+				box-align: center;
+
+				font-size: 40px;
+				text-align: center;
+				vertical-align: middle;
+
+				display: none;
+				z-index: 9;
+			}
+			#turnsindicator {
+				width: 200px;
+				height: 50px;
+				bottom: 0;	
+				left: 0;
+				z-index: 2;
+				
+				margin: 0 0 10px 15px;	
+				text-align: left;
+				position: absolute;
+
+			}
+			#tilesindicator {
+				width: 200px;
+				height: 50px;
+				bottom: 0;
+				right: 0;
+				z-index: 2;
+				
+				margin: 0 15px 10px 0px;
+				text-align: right;
+				position: absolute;
+			}
 		</style>
 	</head>
 	<body>
+		<div id="denied"><div><p id="deniedtext">Denied</p></div></div>
 		<div id="blocker">
 			<div id="instructions">
 				<span style="font-size:40px">Click to play</span>
@@ -139,9 +192,12 @@
 		<div id="hand"><table><tr id="handtable"><td> </td> <td> </td> <td> </td> <td> </td> <td> </td> <td> </td> <td> </td></tr></table></div>
 		<div id="handSelect"><table><tr id="handselecttable"><td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td> <td valign="top"> </td></tr></table></div>
 
-		<div id="scores"><p>Test Score: 300</p></div>
+		<div id="turnsindicator"><p id="turnstext">It is ""'s turn</p></div>
+		<div id="tilesindicator"><p id="tilestext">Remaining Tiles: 1500</p></div>
+		<div id="scores"><p id="scorestext">Test Score: 300</p></div>
 
 		<div id="crosshair"><img src="../../assets/crosshair.png"></div>
+
 
 		<script src="src/js/three.min.js"></script>
 		<script src="src/js/controls/PointerLockControls.js"></script>		

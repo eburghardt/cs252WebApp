@@ -6,27 +6,47 @@ var container;
 var camera, controls, scene, renderer;
 var raycaster;
 var controlsEnabled;
-	
+
+//Raycasted pointer
 var rollOverMesh, rollOverMaterial;
+
+//Geometry for all objects
 var cubeGeo, cubeMaterial;
-	
+
+//For controls	
 var clock = new THREE.Clock();
 
+//Keeping track of objects
 var objects = [];
+
+//All possible textures and materials
 var textures = [];
 var materials = [];
-var testTexture;
 
+//Board size constant
 var boardSize = 15;
 
+
+//keeping track of hand information
 var hand;
-var handchars;
+var handchars = "abcdefg";
 var handIndex = 0;
 
 var handSelect;
 
+//Keeping track of current play
 var newPlay = [];
 var newPlayHighlights = [];
+
+//Websocket
+var ws;
+
+var threeTexture = new THREE.TextureLoader().load('../../assets/three.png');
+threeTexture.minFilter = THREE.LinearMipMapLinearFilter;
+threeTexture.magFilter = THREE.LinearMipMapLinearFilter;
+var threeMesh = new THREE.MeshLambertMaterial({map: threeTexture});
+
+var numTiles = 1470;
 
 
 var blocker = document.getElementById('blocker');
@@ -82,6 +102,10 @@ init();
 animate();
 
 function init() {
+	
+	//Open websocket connection
+	ws = new WebSocket("ws://165.227.181.230:3000");
+
 	container = document.getElementById('container');
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
 	//camera.position.y = getY(7, 7) * 100 + 100;
@@ -100,20 +124,15 @@ function init() {
 	scene.add(rollOverMesh);
 
 	var startCubeGeo = new THREE.BoxGeometry(30, 30, 30);
-	cubePosMesh = new THREE.Mesh(startCubeGeo, rollOverMaterial);
-	/*
-	cubePosMesh.position.x = gridCoorToScreenCoor(7);
-	cubePosMesh.position.y = gridCoorToScreenCoorY(7);
-	cubePosMesh.position.z = gridCoorToScreenCoor(7);
-	*/
-	setGridPosition(cubePosMesh, 7, 7, 7);
-	scene.add(cubePosMesh);	
-	objects.push(cubePosMesh);
+	startCubeMesh = new THREE.Mesh(startCubeGeo, rollOverMaterial);
+	setGridPosition(startCubeMesh, 7, 7, 7);
+	scene.add(startCubeMesh);	
+	objects.push(startCubeMesh);
 
 	//cubes
 	initTextures();
 	initMaterials();	
-
+	/*
 	hand.children[0].innerHTML = textures[0].image.outerHTML;
 	hand.children[1].innerHTML = textures[1].image.outerHTML;
 	hand.children[2].innerHTML = textures[2].image.outerHTML;
@@ -125,14 +144,38 @@ function init() {
 	for(i = 1; i < 7; i++) {
 		handSelect.children[i].innerHTML = '<img crossorigin="Anonymous" src="../../assets/unselect.png">';
 	}
-
+	*/
+	drawHand();
 	cubeGeo = new THREE.BoxGeometry(64, 64, 64);				
 
+	/*
 	var testCube = new THREE.Mesh(cubeGeo, materials[0]);
 	setGridPosition(testCube, 1, 1, 1);
 	scene.add(testCube);
 	objects.push(testCube);	
 
+	var w = new THREE.Mesh(cubeGeo, materials[22]);
+	var o = new THREE.Mesh(cubeGeo, materials[14]);
+	var r = new THREE.Mesh(cubeGeo, materials[17]);
+	var d = new THREE.Mesh(cubeGeo, materials[3]);
+	var tres = new THREE.Mesh(cubeGeo, threeMesh);
+	var d2 = new THREE.Mesh(cubeGeo, materials[3]);
+
+	setGridPosition(w, 11, 7, 5);
+	setGridPosition(o, 11, 7, 6);
+	setGridPosition(r, 11, 7, 7);
+	setGridPosition(d, 11, 7, 8);
+	setGridPosition(tres, 11, 6, 8);
+	setGridPosition(d2, 12, 6, 8);
+
+	scene.add(w);
+	scene.add(o);
+	scene.add(r);
+	scene.add(d);
+	scene.add(tres);
+	scene.add(d2);
+	*/
+	
 	//grids
 	var bottomGridHelper = new THREE.GridHelper(64 * boardSize, boardSize);
 	scene.add(bottomGridHelper);
@@ -203,7 +246,7 @@ function init() {
 	var ambientLight = new THREE.AmbientLight(0xffffff);
 	scene.add(ambientLight);
 
-	renderer = new THREE.WebGLRenderer({antialias: true});
+	renderer = new THREE.WebGLRenderer({antialias: false});
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	container.appendChild(renderer.domElement);
@@ -238,7 +281,7 @@ function onDocumentMouseMove(event) {
 	
 	raycaster.ray.direction.copy(direction);
 	raycaster.ray.origin.copy(controls.getObject().position);
-	console.log(raycaster.ray.direction);
+	//console.log(raycaster.ray.direction);
 
 	var allCollidables = objects.concat(newPlay);	
 	var intersects = raycaster.intersectObjects(allCollidables);
@@ -258,21 +301,29 @@ function onDocumentClick(event) {
 	//event.preventDefault();
 	switch(event.button) {
 		case 0:
-			if(controlsEnabled) {	
+			if(controlsEnabled) {
+				if(handIndex < 0) return;
+	
 				var allCollidables = objects.concat(newPlay);	
 				var intersects = raycaster.intersectObjects(allCollidables);
 				if(intersects.length > 0) {
 					var intersect = intersects[0];
-					var voxel = new THREE.Mesh(cubeGeo, materials[5]);
+					var voxel = new THREE.Mesh(cubeGeo, materials[getSelectedHandCharCode()]);
 					voxel.position.copy(intersect.point).add(intersect.face.normal);
 					voxel.position.divideScalar(64).floor().multiplyScalar(64).addScalar(32);
 					//check that position is in bounds
 					var gridX = screenCoorToGridCoor(voxel.position.x);
-					var gridY = screenCoorToGridCoor(voxel.position.y);
+					var gridY = screenCoorToGridCoorY(voxel.position.y);
 					var gridZ = screenCoorToGridCoor(voxel.position.z);
 					console.log("Block coordinates: " + gridX + " " + gridY + " " + gridZ);
 					if(!(gridX < 0 || gridX >= boardSize || gridY < 0 || gridY >= boardSize || gridZ < 0 || gridZ >= boardSize)) {
 						//in bounds, add to screen
+						voxel.character = getSelectedHandChar();
+						console.log(voxel.character);
+						console.log("Before: " + handchars)
+						handchars = handchars.slice(0, handIndex) + handchars.slice(handIndex + 1);
+						console.log("After: " + handchars)
+						drawHand();
 						scene.add(voxel);
 						newPlay.push(voxel);
 						//Add turquoise highlight
@@ -293,18 +344,22 @@ function onDocumentClick(event) {
 					console.log(index);
 					if(index != -1) {
 						scene.remove(newPlayHighlights[index]);
+						addToHand(newPlay[index].character);					
 						scene.remove(newPlay[index]);
 						newPlayHighlights.splice(index, 1);
 						newPlay.splice(index, 1);
+						drawHand();
 					} else {
 						index = newPlayHighlights.indexOf(intersect.object);
 						console.log("NewPlayHighlights index: " + index);
 						if(index != -1) {
 							scene.remove(newPlayHighlights[index]);
+							addToHand(newPlay[index].character);
 							scene.remove(newPlay[index]);
 							newPlayHighlights.splice(index, 1);
 							newPlay.splice(index, 1);
 						}
+						drawHand();
 					}
 					
 				}		
@@ -316,6 +371,7 @@ function onDocumentClick(event) {
 function onDocumentKeyUp(event) {
 	switch(event.keyCode) {
 		case 13: //enter
+			sendPlay();
 			break;
 	}
 }
@@ -370,19 +426,20 @@ function onMouseWheel(event) {
 	var newHandSelect = handIndex;
 	if(event.deltaY > 0) {
 		newHandSelect--;
-		newHandSelect += 7;
-		newHandSelect = newHandSelect % 7;
+		newHandSelect += handchars.length;
+		newHandSelect = newHandSelect % handchars.length;
 		console.log(newHandSelect);
 		setHandSelect(newHandSelect);
 	} else if (event.deltaY < 0) {
 		newHandSelect++;
-		newHandSelect %= 7;
+		newHandSelect %= handchars.length;
 		setHandSelect(newHandSelect);
 	}
 }
 
 function setHandSelect(newHandSelect) {
 	console.log(handIndex);
+	if(handIndex < 0)	return;
 	handSelect.children[handIndex].innerHTML = '<img crossorigin="Anonymous" src="../../assets/unselect.png">';
 	handIndex = newHandSelect;
 	handSelect.children[handIndex].innerHTML = '<img crossorigin="Anonymous" src="../../assets/select.png">';
@@ -399,13 +456,17 @@ function gridCoorToScreenCoorY(y) {
 
 
 function screenCoorToGridCoor(x) {
-	return (Math.abs(x) - 32) / 64;
+	return (x - 32) / 64;
+}
+
+function screenCoorToGridCoorY(y) {
+	return -(y + 32) / 64;
 }
 
 function setGridPosition(cube, x, y, z) {
 	cube.position.x = gridCoorToScreenCoor(x);
-	cube.position.y = gridCoorToScreenCoorY(x);
-	cube.position.z = gridCoorToScreenCoor(x);
+	cube.position.y = gridCoorToScreenCoorY(y);
+	cube.position.z = gridCoorToScreenCoor(z);
 }
 
 function initTextures() {
@@ -429,11 +490,258 @@ function initMaterials() {
 
 //creates a cube with the proper texture
 //@param c = character to be on cube
-function createCube(c) {
-	for(i = 0; i < 26; i++) {
-		console.log(textures[i]);
+//@param x y z = position
+function createCube(c, x, y, z) {
+	var cube = new THREE.Mesh(cubeGeo, materials[c.charCodeAt() - 'a'.charCodeAt()]);
+	setGridPosition(cube, x, y, z);
+	objects.push(cube);
+	scene.add(cube);
+}
+
+//Hand index will be -1 if no characters are in hand.
+function drawHand() {
+	//handchars = "cdfgabc";
+
+	for(i = 0; i < handchars.length; i++) {
+		hand.children[i].innerHTML = textures[handchars[i].charCodeAt() - 'a'.charCodeAt()].image.outerHTML;
 	}
+
+	for(i = handchars.length; i < 7; i++) {
+		hand.children[i].innerHTML = '<img crossorigin="Anonymous" src="../../assets/empty.png">';
+	}
+
+	if(handchars.length > 0) {
+		handIndex = 0;
+		handSelect.children[0].innerHTML = '<img crossorigin="Anonymous" src="../../assets/select.png">';
+		for(i = 1; i < 7; i++) {
+			handSelect.children[i].innerHTML = '<img crossorigin="Anonymous" src="../../assets/unselect.png">';
+		}
+	} else {
+		handIndex = -1;
+		for(i = 0; i < 7; i++) {
+			handSelect.children[i].innerHTML = '<img crossorigin="Anonymous" src="../../assets/unselect.png">';
+		}
+
+	}
+
+}
+
+function addToHand(c) {
+	if(handchars.length >= 7)	return;
+
+	handchars += c;
+}
+
+//Does nothing if hand length isn't correct
+function setHand(string) {
+	if(string.length == 7) {
+		handchars = string;
+		drawHand();
+	}
+}
+
+function getSelectedHandCharCode() {
+	return handchars[handIndex].charCodeAt() - 'a'.charCodeAt();
+}
+
+function getSelectedHandChar() {
+	return handchars[handIndex];
+}
+
+function sendPlay() {
+	//do nothing if no characters are actually played
+	if(handchars.length == 7) {
+		ws.send("play:");
+		return;
+	}
+
+	//check that all placed blocks are colinear
+	//if only one character is place, it's good
+	if(handchars.length < 6) {
+		//we have at least 2 characters on the board. They all must share at least 2 coordinates with eachother
+		var firstx = newPlay[0].position.x;
+		var firsty = newPlay[0].position.y;
+		var firstz = newPlay[0].position.z;
 	
+		var secondx = newPlay[1].position.x;
+		var secondy = newPlay[1].position.y;
+		var secondz = newPlay[1].position.z;
+
+		if(firstx == secondx && firsty == secondy && firstz == secondz) {
+			illegalPlay("Two blocks in same place");
+			return; //two blocks in the same place
+		}
+
+		if(firstx == secondx && firsty == secondy) {
+			//for each remaining element in new play, make sure they have the appropriate x and y
+			for(i = 2; i < newPlay.length; i++) {
+				if(newPlay[i].position.x != firstx || newPlay[i].position.y != firsty) return;
+			}
+			//Copy newPlay so we can sort it
+			var newPlayCopy = newPlay.slice();
+			newPlayCopy.sort(function(a, b) {return a.position.z - b.position.z});		
+	
+			var string = "";
+			var lastpos = -1;
+			for(i = 0; i < newPlay.length; i++) {
+				if(lastpos != -1) {
+					if(screenCoorToGridCoor(newPlayCopy[i].position.z) == lastpos) {
+						illegalPlay("Two blocks in same place");
+						return;
+					}
+					//insert spaces if there was a gap between this character and the last
+					for(j = 1; j < screenCoorToGridCoor(newPlayCopy[i].position.z) - lastpos; j++) {
+						string += " ";
+					} 
+					
+				}
+				string += newPlayCopy[i].character;
+				lastpos = screenCoorToGridCoor(newPlayCopy[i].position.z);
+			}
+			console.log(string);		
+
+			ws.send("Play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":0\n");
+		} else if(firstx == secondx && firstz == secondz) {
+			//for each remaining element in new play, make sure they have the appropriate x and z
+			for(i = 2; i < newPlay.length; i++) {
+				if(newPlay[i].position.x != firstx || newPlay[i].position.z != firstz) return;
+			}
+			
+			//Copy newPlay so we can sort it
+			var newPlayCopy = newPlay.slice();
+			//because y increase negatively on the screen we sort it backwards
+			newPlayCopy.sort(function(a, b) {return b.position.y - a.position.y});		
+	
+			var string = "";
+			var lastpos = -1;
+			for(i = 0; i < newPlay.length; i++) {
+				if(lastpos != -1) {
+					if(screenCoorToGridCoor(newPlayCopy[i].position.y) == lastpos) {
+						illegalPlay("Two blocks in same place");
+						return;
+					}
+
+					//insert spaces if there was a gap between this character and the last
+					for(j = 1; j < lastpos - screenCoorToGridCoor(newPlayCopy[i].position.y); j++) {
+						string += " ";
+					} 
+					
+				}
+				string += newPlayCopy[i].character;
+				lastpos = screenCoorToGridCoor(newPlayCopy[i].position.y);
+			}
+			console.log(string);	
+
+			ws.send("Play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":1\n");
+		} else if (firsty == secondy && firstz == secondz){
+			//for each remaining element in new play, make sure they have the appropriate y and z
+			for(i = 2; i < newPlay.length; i++) {
+				if(newPlay[i].position.y != firsty || newPlay[i].position.z != firstz) return;
+			}
+			
+			//Copy newPlay so we can sort it
+			var newPlayCopy = newPlay.slice();
+			newPlayCopy.sort(function(a, b) {return a.position.x - b.position.x});		
+	
+			var string = "";
+			var lastpos = -1;
+			for(i = 0; i < newPlay.length; i++) {
+				if(lastpos != -1) {
+					if(screenCoorToGridCoor(newPlayCopy[i].position.x) == lastpos) {
+						illegalPlay("Two blocks in same place");
+						return;
+					}
+
+					//insert spaces if there was a gap between this character and the last
+					for(j = 1; j < screenCoorToGridCoor(newPlayCopy[i].position.x) - lastpos; j++) {
+						string += " ";
+					} 
+					
+				}
+				string += newPlayCopy[i].character;
+				lastpos = screenCoorToGridCoor(newPlayCopy[i].position.x);
+			}
+			console.log(string);	
+			ws.send("Play:" + string + ":" + screenCoorToGridCoor(newPlayCopy[0].position.x) + ":" + screenCoorToGridCoorY(newPlayCopy[0].position.y) + ":" + screenCoorToGridCoor(newPlayCopy[0].position.z) + ":2\n");
+		}
+	} else {
+		ws.send("Play:" + newPlay[0].character + ";" +  newPlay[0].position.x + ";" + newPlay[0].position.y + ";" + newPlay[0].position.z + ";0\n"); 
+	}
+}
+
+//Websocket functions
+ws.onopen = function() {
+	ws.send("Connected");
+};
+
+ws.onmessage = function(event) {
+	var received = event.data;
+	console.log(received);
+
+	parseMessageType(received);
+	
+};
+
+function parseMessageType(message) {
+	console.log(typeof message);
+	if(message.indexOf("board") !== -1) {
+		//message format: "board:"
+
+	} else if(message.indexOf("scores") !== -1) {
+		//message format: "scores;playername: score;playername:score...\n"
+		setScores(message.slice(7));
+	} else if(message.indexOf("turn") !== -1) {
+		//message format: "turn:true/false:playername\n"
+		//true indicates it's your turn
+		setTurnIndicator(message.slice(5));
+	} else if(message.indexOf("tiles") !== -1) {
+		//message format: "tiles:<numtilesremaining>\n"
+		numTiles = message.slice(6);	
+		setRemainingTilesIndicator(numTiles);	
+	} else if(message.indexOf("hand") !== -1) {
+		//message format: "hand:<7 characters>\n"
+		//console.log("New hand: " + message.substring(5, 12));
+		setHand(message.substring(5, 12));	
+	} else if(message.indexOf("denied") !== -1) {
+		//message format: "denied:reason\n
+		console.log("Reason: " + message.slice(7));
+		illegalPlay(message.slice(7));
+	}
+}
+
+function illegalPlay(reason) {
+	var denied = document.getElementById('denied');
+	var deniedtext = document.getElementById('deniedtext');
+	deniedtext.innerHTML = "Denied: " + reason;
+	denied.style.display = '';
+
+	setTimeout(function(){denied.style.display = 'none'}, 1000);
+}
+
+function setScores(scores) {
+	var scoresText = document.getElementById('scorestext');
+	var allScores = scores.split(";");
+	var newText = "";
+	for(i = 0; i < allScores.length; i++) {
+		newText += allScores[i];
+		newText += "<br><br>";
+	}
+	console.log(newText);
+	scoresText.innerHTML = newText;
+}
+
+function setTurnIndicator(turnMessage) {
+	var turnsText = document.getElementById('turnstext');
+	if(turnMessage.indexOf("true") !== -1) {
+		turnsText.innerHTML = "Your turn.";
+	} else {
+		turnsText.innerHTML = turnMessage.slice(turnMessage.indexOf(":") + 1) + "'s turn";
+	}
+}
+
+function setRemainingTilesIndicator(numTiles) {
+	var tilesText = document.getElementById('tilestext');
+	tilesText.innerHTML = "Remaining tiles: " + numTiles;
 }
 
 function animate() {
