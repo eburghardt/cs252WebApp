@@ -159,43 +159,4 @@ string Game::getNumTiles() {
 	return "" + bag.getNumTilesRemaining();
 }
 
-/*
-int main() {
-	Board board = Board();
-	board.placeString("test", 7, 7, 7, 1);
-	cout << board.printBoard() << endl;
 
-//	Player player1 = Player();
-//	Player player2 = Player();
-
-//	player1.setScore(100);
-	cout << player1.getScore() << endl;
-	vector<Player> playerList = {player1, player2};
-	//players.insert(players.end(), player1);
-	//players.insert(players.end(), player2);
-	
-	Game game(playerList);
-	
-	Board gameBoard = game.getBoard();
-	gameBoard.placeChar('i', 7, 11, 7);
-	gameBoard.placeChar('n', 7, 12, 7);
-	gameBoard.placeChar('g', 7, 13, 7);
-
-	cout << "Board:\n" << game.getBoard().printBoard() << endl;
-
-	game.play("test", 7, 7, 7, 1, playerList.front());
-	cout << "Board: " << endl;
-	cout << game.getBoard().printBoard() << endl;
-
-	cout << "Score: " << playerList.front().getScore() << endl;
-
-
-	//testBag
-	Bag bag = Bag();
-	while(!bag.isEmpty()) {
-		cout << bag.getTile() << endl;
-	}	
-
-	exit(0);
-}
-*/

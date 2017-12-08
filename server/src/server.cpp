@@ -264,22 +264,27 @@ void processRequest(int fd) {
 		//spawn the game server
 		int ret = fork();
 		if(ret == 0) {
+			close(fd);
 			//child
 			char portStr[7];
-			sprintf(portStr, "%d", returnPort);
-			char ** argv = (char **) malloc(3 * sizeof(char *));
+			sprintf(portStr, "%d", returnPort++);
+			char ** argv = (char **) malloc(4 * sizeof(char *));
+			*argv = "./bin/game";
 			if(cgiBinVars)
-				*argv = cgiBinVars + 9;
+				*(argv + 1) = cgiBinVars + 9;
 			else
-				*argv = strdup("Nickname");
-			*(argv + 1) = (char *)&portStr;
-			*(argv + 2) = NULL;
+				*(argv + 1) = strdup("Nickname");
+			*(argv + 2) = (char *)&portStr;
+			*(argv + 3) = NULL;
 			
-			execvp("../bin/game", argv);
+			execvp("./bin/game", argv);
+			_exit(0);
 		}
 	
 		//parent
 
+	
+		printf("\n\nParent process\n\n");	
 		//send data
 		std::string send = std::to_string(returnPort);
 		returnPort++;

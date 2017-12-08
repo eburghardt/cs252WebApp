@@ -534,46 +534,46 @@ string Board::printBoard() {
 }
 
 /*	Testing		*************************
-int main() {
-	Board board;
-
-	cout << board.printBoard() << endl;
-
-	//board.placeChar('a', 7, 7, 7);
-	cout << board.printBoard() << endl;
-
-	cout << board.getMultiplier(" testing", 7, 7, 7, 1) << endl;
-
-	cout << board.canPlaceString("test", 7, 7, 7, 0) << endl;
-
-	cout << board.canPlaceString(" test", 7, 7, 7, 0) << endl;
-
-	board.placeString("test", 7, 7, 7, 0);
-	board.placeString("est", 10, 8, 7, 1);
-	board.placeString("est", 7, 8, 7, 1);
- 	
-	cout << board.printBoard() << endl;
-	
-	cout << board.canPlaceString("sets", 7, 11, 7, 0) << endl;
-	
-	
-	
-	vector<string> wordList = board.getPlayWordList("sets", 7, 11, 7, 0);
-	
-	board.placeString("sets", 7, 11, 7, 0);
-
-	cout << "here" << endl;
-	cout << board.printBoard() << endl;
-
-		
-	cout << "WordList: " << endl;	
-
-	vector<string>::iterator it;
-	for(it = wordList.begin(); it < wordList.end(); it++) {
-		cout << *it << endl;
-	}
-
-	board.placeString("tes ing", 11, 4, 7, 1);
-
-}
+ *int main() {
+ *	Board board;
+ *
+ *	cout << board.printBoard() << endl;
+ *
+ *	//board.placeChar('a', 7, 7, 7);
+ *	cout << board.printBoard() << endl;
+ *
+ *	cout << board.getMultiplier(" testing", 7, 7, 7, 1) << endl;
+ *
+ *	cout << board.canPlaceString("test", 7, 7, 7, 0) << endl;
+ *
+ *	cout << board.canPlaceString(" test", 7, 7, 7, 0) << endl;
+ *
+ *	board.placeString("test", 7, 7, 7, 0);
+ *	board.placeString("est", 10, 8, 7, 1);
+ *	board.placeString("est", 7, 8, 7, 1);
+ *	
+ *	cout << board.printBoard() << endl;
+ *	
+ *	cout << board.canPlaceString("sets", 7, 11, 7, 0) << endl;
+ *	
+ *	
+ *	
+ *	vector<string> wordList = board.getPlayWordList("sets", 7, 11, 7, 0);
+ *	
+ *	board.placeString("sets", 7, 11, 7, 0);
+ *
+ *	cout << "here" << endl;
+ *	cout << board.printBoard() << endl;
+ *
+ *		
+ *	cout << "WordList: " << endl;	
+ *
+ *	vector<string>::iterator it;
+ *	for(it = wordList.begin(); it < wordList.end(); it++) {
+ *		cout << *it << endl;
+ *	}
+ *
+ *	board.placeString("tes ing", 11, 4, 7, 1);
+ *
+ *}
 */

@@ -10,6 +10,11 @@
 
 using namespace std;
 int main(int argc, char ** argv) {
+	cout << "Argc: " << argc << endl;
+	for(int i = 0; i < argc; i++) {
+		cout << *(argv + i) << endl;
+	}
+
 	//main player1Name player1port player2Name player2Port
 	if(argc < 3) {
 		cerr << "Error: not enough arguments. Need at least 1 player" << endl;
@@ -63,6 +68,7 @@ void createHub(Player * playerP) {
 	
 	h.onConnection([](uWS::WebSocket<uWS::CLIENT> * ws, uWS::HttpRequest req) {
 		cout << "Here" << endl;
+		ws->send("Connected");
 	});	
 
 	h.onMessage([&game, &player](uWS::WebSocket<uWS::SERVER> * ws, char * message, size_t length, uWS::OpCode opCode) {
@@ -70,6 +76,7 @@ void createHub(Player * playerP) {
 		string mess = string(message);
 		//connect
 		if(mess == "Connected") {
+			/*
 			string scores = "";
 			string turn = "";
 			string hand = "";
@@ -84,6 +91,7 @@ void createHub(Player * playerP) {
 			ws->send(turn.c_str(), sizeof(turn.c_str()), opCode);
 			ws->send(hand.c_str(), sizeof(hand.c_str()), opCode);
 			ws->send(numTiles.c_str(), sizeof(numTiles.c_str()), opCode);
+			*/
 		} else if(mess.substr(0, 5) == "play:") {
 			size_t pos = mess.find(":");
 			mess.erase(0, pos + 1);
@@ -103,7 +111,9 @@ void createHub(Player * playerP) {
 
 			
 			bool success = game->play(play, x, y, z, dir, player);
-			
+		
+			cout << play << x << y << z << dir;
+	
 			if(success) {
 				ws->send(message, length, opCode);
 			//	const char * newHand = "hand:newhand\n"; 
@@ -113,6 +123,10 @@ void createHub(Player * playerP) {
 			}
 		}
 		
+	});
+
+	h.onDisconnection([](uWS::WebSocket<uWS::SERVER> *ws, int code, char * message, size_t length) {
+		exit(0);
 	});
 
 	if(h.listen(player.getPort()))

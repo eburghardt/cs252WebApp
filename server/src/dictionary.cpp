@@ -68,7 +68,7 @@ bool contains(Node * root, string word) {
 
 
 Dictionary::Dictionary() {
-	fileName = "./assets/dictionary.txt";
+	fileName = "../assets/dictionary.txt";
 	root = createNode();
 	
 	ifstream infile(fileName.c_str());
