@@ -47,7 +47,9 @@ int main(int argc, char ** argv) {
 	game = new Game(players);
 
 	createThread(players.at(0));		
-	while(1);
+	while(1) {
+		sleep(10000);
+	}
 }
 
 void createThread(Player player) {

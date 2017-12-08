@@ -128,7 +128,7 @@ string Board::findWordZ(char c, int x, int y, int z) {
 			out += c;
 			startZ++;	
 		} else {
-			out += getChar(x, y, startZ);
+			out += getChar(x, y, startZ++);
 		}
 	}
 
@@ -297,6 +297,28 @@ bool Board::canPlaceString(string play, int x, int y, int z, int direction) {
 			crossesExisting = false;
 			return false;
 		}
+
+		//Check to see if the we contact any letters on the cross axes
+		char c;
+		if(direction != 0) {
+			if(((c = getChar(x - 1, y, z)) >= 'a' && c <= 'z') || ((c = getChar(x + 1, y, z)) >= 'a' && c <= 'z')) {
+				crossesExisting = true;
+			}
+		}
+		if(direction != 1) {
+			if(((c = getChar(x, y - 1, z)) >= 'a' && c <= 'z') || ((c = getChar(x, y + 1, z)) >= 'a' && c <= 'z')) {
+				crossesExisting = true;
+			}
+
+		}
+		if(direction != 2) {
+			if(((c = getChar(x, y, z - 1)) >= 'a' && c <= 'z') || ((c = getChar(x, y, z + 1)) >= 'a' && c <= 'z')) {
+				crossesExisting = true;
+			}
+
+		}
+
+
 	} else {
 		//invalid character in the string
 		crossesExisting = false;
@@ -432,7 +454,6 @@ vector<string> Board::getPlayWordList(string play, int x, int y, int z, int dire
 		}
 	}
 
-
 	//Now we need to find any suffixes if the exist on the board. 
 	char c;
 	switch(direction) {
@@ -469,6 +490,10 @@ vector<string> Board::getPlayWordList(string play, int x, int y, int z, int dire
 		cerr << wordList.at(i) << endl;
 	}
 	**************************************/
+	cerr << "WordList: " << endl;
+	for(i = 0; i < wordList.size(); i++) {
+		cerr << wordList.at(i) << endl;
+	}
 
 	return wordList;
 }
