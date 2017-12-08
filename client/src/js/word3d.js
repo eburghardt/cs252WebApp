@@ -548,6 +548,10 @@ function getSelectedHandChar() {
 }
 
 function sendPlay() {
+	if(ws == undefined) {
+		console.log("It's undefined yo");
+	}
+
 	//do nothing if no characters are actually played
 	if(handchars.length == 7) {
 		ws.send("play:");
@@ -699,8 +703,7 @@ function parseMessageType(message) {
 		console.log("Reason: " + message.slice(7));
 		illegalPlay(message.slice(7));
 	} else if(message.indexOf("board") !== -1) {
-		//message format: "board:"
-		
+		//message format: "board:"	
 	}
 }
 
@@ -792,12 +795,15 @@ function playString(string){
 }
 
 function getPort(theUrl, callback) {
+	console.log("We're trying to get the port");
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function() {
-		if(xmlHttp.readyState == 4 && xmlHttp.status == 200)
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+			console.log("We got that port");
 			callback(xmlHttp.responseText);
+		}
 	}
-	xmlHttp.open("GET", "https://cors-anywhere.herokuapp.com/" + theUrl, true); //true for asynchronous
+	xmlHttp.open("GET", theUrl, true); //true for asynchronous
 	xmlHttp.send(null);
 }
 

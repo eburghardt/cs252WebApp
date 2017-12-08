@@ -6,7 +6,6 @@
  */
 
 #include "../include/game.hpp"
-#include "../include/game.hpp"
 #include <uWS/uWS.h>
 #include <iostream>
 #include <vector>
