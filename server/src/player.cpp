@@ -1,5 +1,6 @@
 
 #include "../include/player.hpp"
+#include <iostream>
 
 using namespace std;
 
@@ -9,8 +10,8 @@ Player::Player(string name, int port) {
 	this->port = port;
 }
 
-std::vector<char> Player::getHand() {
-	return hand;
+std::vector<char> * Player::getHand() {
+	return &hand;
 }
 
 string Player::getHandString() {
@@ -30,11 +31,11 @@ void Player::addToHand(char c) {
 }
 
 int Player::getScore() {
-	return score;
+	return this->score;
 }
 
 int Player::getPort() {
-	return port;
+	return this->port;
 }
 
 void Player::setScore(int score) {
@@ -42,7 +43,9 @@ void Player::setScore(int score) {
 }
 
 void Player::addToScore(int points) {
-	score += points;
+	cout << "Before score: " << this->score << endl;
+	this->score += points;
+	cout << "After score: " << this->score << endl;
 }
 
 string Player::getName() {
@@ -56,5 +59,7 @@ string Player::toString() {
 	out += to_string(this->score);
 	out += "\nPort: ";
 	out += to_string(this->port);
+	out += "\nHand: ";
+	out += getHandString();
 	return out;
 }

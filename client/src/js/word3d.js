@@ -696,8 +696,8 @@ function parseMessageType(message) {
 		setRemainingTilesIndicator(numTiles);	
 	} else if(message.indexOf("hand") !== -1) {
 		//message format: "hand:<7 characters>"
-		//console.log("New hand: " + message.substring(5, 12));
-		setHand(message.slice(5));	
+		console.log("New hand: " + message.substring(5, 12));
+		setHand(message.substring(5, 12));	
 	} else if(message.indexOf("denied") !== -1) {
 		//message format: "denied:reason\n
 		console.log("Reason: " + message.slice(7));

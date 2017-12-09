@@ -75,11 +75,14 @@ int Game::getWordValue(string play) {
 //constructor
 // @param numPlayers = number of players
 // @param players = pointer to array of player pointers
-Game::Game(vector<Player> players) {
+Game::Game(vector<Player> * players) {
 	board = new Board;
 	dictionary = Dictionary("./assets/dictionary.txt");
 	bag = Bag();
-	this->players = players;	
+	this->players = players;
+	for(int i = 0; i < players->size(); i++) {
+		initHand(players->at(i));
+	}	
 }
 
 int Game::getPlayValue(string play, int x, int y, int z, int direction) {
@@ -107,6 +110,18 @@ bool Game::play(string play, int x, int y, int z, int direction, Player &player)
 		return false;
 	}
 	
+	std::vector<char> handCopy = *(player.getHand());
+	//Check that hand has proper letters
+	cout << "Player hand: " << player.getHandString() << endl;
+	for(char c = 'a'; c <= 'z'; c++) {
+		int numPlay = count(play.begin(), play.end(), c);
+		int numHand = count(handCopy.begin(), handCopy.end(), c);
+		cout << "char: " << c << "\nnumPlay: " << numPlay << "\nNumHand: " << numHand << endl;
+		if(numPlay > numHand) {
+			return false;
+		}
+	}
+
 	//Check that all words are legal
 	vector<string> wordList = board->getPlayWordList(play, x, y, z, direction);
 	vector<string>::iterator it;
@@ -129,6 +144,12 @@ bool Game::play(string play, int x, int y, int z, int direction, Player &player)
 	
 	board->placeString(play, x, y, z, direction);
 
+	cout << "Placed string" << endl;
+
+	refreshHand(player, play);
+	
+	cout << "Refreshed hand" << endl;
+
 	return true;	
 }
 
@@ -140,12 +161,35 @@ void Game::startGame() {
 	
 }
 
+void Game::refreshHand(Player &player, string play) {
+	std::vector<char> * hand = player.getHand();
+
+	for(int i = 0; i < play.length(); i++) {
+		char c = play.at(i);
+		if(c >= 'a' && c <= 'z')
+			hand->erase(find(hand->begin(), hand->end(), c));
+	}
+
+	while(hand->size() < 7) {
+		hand->insert(hand->end(), bag.getTile());
+	}
+
+	cout << player.toString() << endl;
+}
+
+void Game::initHand(Player &player) {
+	for(int i = 0; i < 7; i++) {
+		player.addToHand(bag.getTile());
+	}
+}
+
 string Game::getScores() {
 	string out = "scores;";
-	for(int i = 0; i < players.size(); i++) {
-		out += players.at(i).getName();
+	for(int i = 0; i < players->size(); i++) {
+		out += players->at(i).getName();
 		out += ": ";
-		out += players.at(i).getScore();
+		out += to_string(players->at(i).getScore());
+		cout << players->at(i).getScore() << endl;
 		out += ";";
 	}
 	return out;

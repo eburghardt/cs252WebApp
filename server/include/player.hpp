@@ -13,7 +13,7 @@ class Player {
 	public:
 		Player(std::string name, int port);
 		
-		std::vector<char> getHand();
+		std::vector<char> * getHand();
 		std::string getHandString();
 		int getHandSize();
 		void addToHand(char c);

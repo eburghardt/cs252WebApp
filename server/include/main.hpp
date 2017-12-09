@@ -13,5 +13,5 @@
 
 Game * game;
 
-void createThread(Player player);
+void createThread(Player * player);
 void createHub(Player * player);

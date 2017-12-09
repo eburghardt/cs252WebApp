@@ -44,27 +44,27 @@ int main(int argc, char ** argv) {
 
 	cout << "Here 3" << endl;	
 
-	game = new Game(players);
+	game = new Game(&players);
 
-	createThread(players.at(0));		
+	createThread(&(players.at(0)));		
 	while(1) {
 		sleep(10000);
 	}
 }
 
-void createThread(Player player) {
+void createThread(Player * player) {
 	pthread_t thread;
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-	pthread_create(&thread, &attr, (void *(*)(void*))createHub, (void *) &player);
+	pthread_create(&thread, &attr, (void *(*)(void*))createHub, (void *) player);
 }
 
 void createHub(Player * playerP) {
 	uWS::Hub h;
-	Player player = *playerP;	
+	Player * player = playerP;	
 
-	string portStr = to_string(player.getPort());
+	string portStr = to_string(player->getPort());
 
 	cout << portStr << endl;
 	
@@ -73,27 +73,28 @@ void createHub(Player * playerP) {
 		ws->send("Connected");
 	});	
 
-	h.onMessage([&game, &player](uWS::WebSocket<uWS::SERVER> * ws, char * message, size_t length, uWS::OpCode opCode) {
+	h.onMessage([&game, player](uWS::WebSocket<uWS::SERVER> * ws, char * message, size_t length, uWS::OpCode opCode) {
 		//parse message type
 		string mess = string(message);
 		//connect
-		if(mess == "Connected") {
-			/*
-			string scores = "";
+		if(mess.length() >= 9 && mess.substr(0, 9) == "Connected") {
+			cout << "\n\nPlayer connected\n\n" << endl;
+			string scores = player->getName();
 			string turn = "";
-			string hand = "";
+			string hand = "hand:";
 			string numTiles = "";
 			
 			scores += game->getScores();
 			turn += game->getTurn();
-			hand += player.getHandString();
-			numTiles += game->getNumTiles();
+			hand += player->getHandString();
+			//numTiles += game->getNumTiles();
 
-			ws->send(scores.c_str(), sizeof(scores.c_str()), opCode);
-			ws->send(turn.c_str(), sizeof(turn.c_str()), opCode);
-			ws->send(hand.c_str(), sizeof(hand.c_str()), opCode);
-			ws->send(numTiles.c_str(), sizeof(numTiles.c_str()), opCode);
-			*/
+			cout << "Scores: " << scores.c_str() << "\nTurn: " << turn.c_str() << "\nHand: " << hand.c_str() << "\nNumTiles: " << numTiles.c_str() << endl;
+
+			ws->send(scores.c_str(), strlen(scores.c_str()), opCode);
+			ws->send(turn.c_str(), strlen(turn.c_str()), opCode);
+			ws->send(hand.c_str(), strlen(hand.c_str()), opCode);
+			//ws->send(numTiles.c_str(), strlen(numTiles.c_str()), opCode);
 		} else if(mess.substr(0, 5) == "play:") {
 			size_t pos = mess.find(":");
 			mess.erase(0, pos + 1);
@@ -112,16 +113,19 @@ void createHub(Player * playerP) {
 			int dir = stoi(mess);
 
 			
-			bool success = game->play(play, x, y, z, dir, player);
-		
+			bool success = game->play(play, x, y, z, dir, *player);
+			cout << game->getScores() << endl;	
+	
 			cout << play << x << y << z << dir;
 	
 			if(success) {
 				ws->send(message, length, opCode);
-			//	const char * newHand = "hand:newhand\n"; 
-			//	ws->send(newHand, sizeof(newHand), opCode);
+				ws->send(game->getScores().c_str(), game->getScores().length(), opCode);
+				string hand = "hand:";
+				hand += player->getHandString(); 
+				ws->send(hand.c_str(), strlen(hand.c_str()), opCode);
 			} else {
-				ws->send("Denied: Illegal\n", sizeof("Denied: Illegal\n"), opCode);
+				ws->send("Denied: Illegal\n", strlen("Denied: Illegal\n"), opCode);
 			}
 		}
 		
@@ -129,9 +133,10 @@ void createHub(Player * playerP) {
 
 	h.onDisconnection([](uWS::WebSocket<uWS::SERVER> *ws, int code, char * message, size_t length) {
 		exit(0);
+		
 	});
 
-	if(h.listen(player.getPort()))
+	if(h.listen(player->getPort()))
 		h.run();
 	
 }

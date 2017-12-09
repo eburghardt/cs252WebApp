@@ -273,7 +273,7 @@ void processRequest(int fd) {
 			if(cgiBinVars)
 				*(argv + 1) = cgiBinVars + 9;
 			else
-				*(argv + 1) = strdup("Nickname");
+				*(argv + 1) = strdup("Score");
 			*(argv + 2) = (char *)&portStr;
 			*(argv + 3) = NULL;
 			
