@@ -422,17 +422,20 @@ vector<string> Board::getPlayWordList(string play, int x, int y, int z, int dire
 		default:
 			break;
 	}
-	
+	cout << "line: " << __LINE__ << endl;	
 	//Our backtracking methods keep going until they hit a blank space on board. Spaces are blank spaces on the board,
 	//so we have to increment past them
 	int i = 1;
-	while(play.at(i) == ' ') {
+	while(i < play.length() && play.at(i) == ' ') {
 		i++;
 	}
+	cout << "line: " << __LINE__ << endl;	
 	//Add our prefix to our word.
 	onAxis += prefix;	
+	cout << "line: " << __LINE__ << endl;	
 	//starting at the index we found, continue to the end of the word
 	for(i; i < play.length(); i++) {
+		cout << "line: " << __LINE__ << endl;	
 		if(play.at(i) != ' ') {
 			onAxis += play.at(i);
 		} else {
@@ -453,6 +456,7 @@ vector<string> Board::getPlayWordList(string play, int x, int y, int z, int dire
 			}	
 		}
 	}
+	cout << "line: " << __LINE__ << endl;	
 
 	//Now we need to find any suffixes if the exist on the board. 
 	char c;
@@ -476,13 +480,16 @@ vector<string> Board::getPlayWordList(string play, int x, int y, int z, int dire
 			break;
 	}	
 
+	cout << "line: " << __LINE__ << endl;	
 	vector<string> wordList;
 	wordList.insert(wordList.begin(), onAxis);
+	cout << "line: " << __LINE__ << endl;	
 	
 	//get off-axis words
 	vector<string> offAxis = getOffAxisWordList(play, x, y, z, direction);
 	//Append them to our list
 	wordList.insert(wordList.end(), offAxis.begin(), offAxis.end());
+	cout << "line: " << __LINE__ << endl;	
 
 	/*	Testing		***************	
 	cerr << "WordList: " << endl;
@@ -490,10 +497,25 @@ vector<string> Board::getPlayWordList(string play, int x, int y, int z, int dire
 		cerr << wordList.at(i) << endl;
 	}
 	**************************************/
+	
+	//remove single characters from wordlist. Needed for single character plays to work
+	for(i = wordList.size() - 1; i >= 0; i--) {
+		if(wordList.at(i).length() == 1) {
+			wordList.erase(wordList.begin() + i);
+		}
+	}
+	
+	/*
+	if(wordList.size() == 0) {
+		return false;
+	}
+	*/
+
 	cerr << "WordList: " << endl;
 	for(i = 0; i < wordList.size(); i++) {
 		cerr << wordList.at(i) << endl;
 	}
+
 
 	return wordList;
 }
