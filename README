@@ -5,3 +5,5 @@ Word3D - a WIP 3-dimensional Scrabble-analog
 Technologies and libraries:
 	three.js
 	uWebSockets
+
+uWebSockets MUST be installed in order to run this. It can be found at https://github.com/uNetworking/uWebSockets
