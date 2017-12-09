@@ -79,22 +79,22 @@ void createHub(Player * playerP) {
 		//connect
 		if(mess.length() >= 9 && mess.substr(0, 9) == "Connected") {
 			cout << "\n\nPlayer connected\n\n" << endl;
-			string scores = player->getName();
+			string scores = "";
 			string turn = "";
 			string hand = "hand:";
-			string numTiles = "";
+			string numTiles = "tiles:";
 			
 			scores += game->getScores();
 			turn += game->getTurn();
 			hand += player->getHandString();
-			//numTiles += game->getNumTiles();
+			numTiles += game->getNumTiles();
 
 			cout << "Scores: " << scores.c_str() << "\nTurn: " << turn.c_str() << "\nHand: " << hand.c_str() << "\nNumTiles: " << numTiles.c_str() << endl;
 
 			ws->send(scores.c_str(), strlen(scores.c_str()), opCode);
 			ws->send(turn.c_str(), strlen(turn.c_str()), opCode);
 			ws->send(hand.c_str(), strlen(hand.c_str()), opCode);
-			//ws->send(numTiles.c_str(), strlen(numTiles.c_str()), opCode);
+			ws->send(numTiles.c_str(), strlen(numTiles.c_str()), opCode);
 		} else if(mess.substr(0, 5) == "play:") {
 			size_t pos = mess.find(":");
 			mess.erase(0, pos + 1);
@@ -124,6 +124,10 @@ void createHub(Player * playerP) {
 				string hand = "hand:";
 				hand += player->getHandString(); 
 				ws->send(hand.c_str(), strlen(hand.c_str()), opCode);
+
+				string tiles = "tiles:";
+				tiles += game->getNumTiles();
+				ws->send(tiles.c_str(), strlen(tiles.c_str()), opCode);
 			} else {
 				ws->send("Denied: Illegal\n", strlen("Denied: Illegal\n"), opCode);
 			}

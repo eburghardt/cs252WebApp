@@ -200,7 +200,7 @@ string Game::getTurn() {
 }
 
 string Game::getNumTiles() {
-	return "" + bag.getNumTilesRemaining();
+	return to_string(bag.getNumTilesRemaining());
 }
 
 

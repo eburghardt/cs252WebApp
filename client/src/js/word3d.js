@@ -692,6 +692,7 @@ function parseMessageType(message) {
 		setTurnIndicator(message.slice(5));
 	} else if(message.indexOf("tiles") !== -1) {
 		//message format: "tiles:<numtilesremaining>\n"
+		console.log(message);
 		numTiles = message.slice(6);	
 		setRemainingTilesIndicator(numTiles);	
 	} else if(message.indexOf("hand") !== -1) {
